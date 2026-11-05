@@ -1,0 +1,21 @@
+name: ci
+on:
+  pull_request:
+  push:
+    branches: [master]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: yarn
+      # The runner's global yarn hands off to .yarn/releases via yarnPath.
+      - run: yarn install --immutable
+      - run: yarn typecheck
+      - run: yarn build
+      - name: Check package contents
+        run: yarn pack --dry-run

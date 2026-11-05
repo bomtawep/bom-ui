@@ -1,0 +1,11 @@
+node_modules/
+dist/
+*.tgz
+.env*
+.DS_Store
+*.log
+
+# Yarn 4 — commit the pinned release, ignore caches/state
+.yarn/*
+!.yarn/releases
+.pnp.*
