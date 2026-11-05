@@ -6,7 +6,7 @@
 
 **Architecture:** CSS variables `--bom-*` ใน `src/styles/tokens.css` + CSS ต่อ component (`src/components/<Name>/<Name>.css`) ถูกรวมเป็น `dist/styles.css` ใน `onSuccess` ของ tsup. ไฟล์ `vite.config.ts` ไฟล์เดียวใช้ร่วมกันระหว่าง Vitest และ Storybook. Component ใช้ `forwardRef` + `cn()` helper.
 
-**Tech Stack:** Node 22, Yarn 4.18.1, TypeScript 5.9.3, tsup 8.5.1, React 19 (dev) / peer `>=18`, Vitest 5.1.0 + jsdom 30.1.3, Testing Library, axe-core 4.14.0, Storybook 10.6.5 + Vite 8.3.6
+**Tech Stack:** Node 22, Yarn 4.18.1, TypeScript 5.9.3, tsup 8.5.1, React 19 (dev) / peer `>=18`, Vitest 5.1.0 + jsdom 30.1.3, Testing Library, axe-core 4.14.0, Storybook 10.6.5 + Vite 8.3.5
 
 Spec: [docs/superpowers/specs/2026-11-05-component-library-design.md](../specs/2026-11-05-component-library-design.md)
 
@@ -83,7 +83,7 @@ Expected: `v22.x.x`
 - [ ] **Step 2: ติดตั้ง test tooling**
 
 ```bash
-yarn add -D -E vitest@5.1.0 jsdom@30.1.3 vite@8.3.6 @vitejs/plugin-react@6.2.1 @testing-library/react@16.3.3 @testing-library/dom@10.4.2 @testing-library/user-event@14.6.8 @testing-library/jest-dom@7.0.1 axe-core@4.14.0
+yarn add -D -E vitest@5.1.0 jsdom@30.1.3 vite@8.3.5 @vitejs/plugin-react@6.2.1 @testing-library/react@16.3.3 @testing-library/dom@10.4.2 @testing-library/user-event@14.6.8 @testing-library/jest-dom@7.0.1 axe-core@4.14.0
 ```
 
 Expected: install สำเร็จ, `yarn.lock` เปลี่ยน, ไม่มี `package-lock.json`. ถ้า yarn เตือน peer dependency ที่ไม่ใช่ optional ให้หยุดและรายงาน
