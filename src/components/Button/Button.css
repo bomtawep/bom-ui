@@ -1,0 +1,73 @@
+.bom-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--bom-space-2);
+  /* md is the default size; .bom-btn--sm / --lg override padding and font-size */
+  padding: var(--bom-space-2) var(--bom-space-4);
+  border: 1px solid transparent;
+  border-radius: var(--bom-radius-md);
+  font-family: inherit;
+  font-size: var(--bom-font-size-md);
+  font-weight: var(--bom-font-weight-medium);
+  line-height: 1.25;
+  cursor: pointer;
+  transition:
+    background-color var(--bom-duration-fast),
+    border-color var(--bom-duration-fast),
+    color var(--bom-duration-fast);
+}
+
+.bom-btn:focus-visible {
+  outline: 2px solid var(--bom-color-ring);
+  outline-offset: 2px;
+}
+
+.bom-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.bom-btn--sm {
+  padding: var(--bom-space-1) var(--bom-space-3);
+  font-size: var(--bom-font-size-sm);
+}
+
+.bom-btn--lg {
+  padding: var(--bom-space-3) var(--bom-space-6);
+  font-size: var(--bom-font-size-lg);
+}
+
+.bom-btn--primary {
+  background: var(--bom-color-primary);
+  color: var(--bom-color-primary-fg);
+}
+
+.bom-btn--primary:hover:not(:disabled) {
+  background: var(--bom-color-primary-hover);
+}
+
+.bom-btn--secondary {
+  background: transparent;
+  border-color: var(--bom-color-border);
+  color: var(--bom-color-fg);
+}
+
+.bom-btn--ghost {
+  background: transparent;
+  color: var(--bom-color-fg);
+}
+
+.bom-btn--secondary:hover:not(:disabled),
+.bom-btn--ghost:hover:not(:disabled) {
+  background: var(--bom-color-muted);
+}
+
+.bom-btn--danger {
+  background: var(--bom-color-danger);
+  color: var(--bom-color-danger-fg);
+}
+
+.bom-btn--danger:hover:not(:disabled) {
+  background: var(--bom-color-danger-hover);
+}

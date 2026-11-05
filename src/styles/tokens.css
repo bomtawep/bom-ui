@@ -1,0 +1,89 @@
+/*
+ * Design tokens. Override any --bom-* variable in the consuming app to theme the library.
+ * Dark mode: follows the OS unless <html data-theme="light|dark"> forces one.
+ */
+:root,
+[data-theme='light'] {
+  color-scheme: light;
+  --bom-color-bg: #ffffff;
+  --bom-color-fg: #0f172a;
+  --bom-color-muted: #f1f5f9;
+  --bom-color-muted-fg: #64748b;
+  --bom-color-border: #cbd5e1;
+  --bom-color-ring: #3b82f6;
+  --bom-color-primary: #1d4ed8;
+  --bom-color-primary-hover: #1e40af;
+  --bom-color-primary-fg: #ffffff;
+  --bom-color-danger: #dc2626;
+  --bom-color-danger-hover: #b91c1c;
+  --bom-color-danger-fg: #ffffff;
+  --bom-color-success: #16a34a;
+  --bom-color-warning: #d97706;
+  --bom-color-info: #0284c7;
+
+  --bom-radius-sm: 0.25rem;
+  --bom-radius-md: 0.375rem;
+  --bom-radius-lg: 0.5rem;
+  --bom-radius-full: 9999px;
+
+  --bom-space-1: 0.25rem;
+  --bom-space-2: 0.5rem;
+  --bom-space-3: 0.75rem;
+  --bom-space-4: 1rem;
+  --bom-space-6: 1.5rem;
+
+  --bom-font-sans: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Noto Sans Thai', sans-serif;
+  --bom-font-size-sm: 0.875rem;
+  --bom-font-size-md: 1rem;
+  --bom-font-size-lg: 1.125rem;
+  --bom-font-weight-medium: 500;
+
+  --bom-shadow-sm: 0 1px 2px rgb(15 23 42 / 0.06);
+  --bom-shadow-md: 0 4px 12px rgb(15 23 42 / 0.12);
+
+  --bom-duration-fast: 150ms;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    color-scheme: dark;
+    --bom-color-bg: #0b1120;
+    --bom-color-fg: #e2e8f0;
+    --bom-color-muted: #1e293b;
+    --bom-color-muted-fg: #94a3b8;
+    --bom-color-border: #334155;
+    --bom-color-ring: #60a5fa;
+    --bom-color-primary: #3b82f6;
+    --bom-color-primary-hover: #2563eb;
+    --bom-color-primary-fg: #ffffff;
+    --bom-color-danger: #ef4444;
+    --bom-color-danger-hover: #dc2626;
+    --bom-color-danger-fg: #ffffff;
+    --bom-color-success: #22c55e;
+    --bom-color-warning: #f59e0b;
+    --bom-color-info: #38bdf8;
+    --bom-shadow-sm: 0 1px 2px rgb(0 0 0 / 0.4);
+    --bom-shadow-md: 0 4px 12px rgb(0 0 0 / 0.5);
+  }
+}
+
+[data-theme='dark'] {
+  color-scheme: dark;
+  --bom-color-bg: #0b1120;
+  --bom-color-fg: #e2e8f0;
+  --bom-color-muted: #1e293b;
+  --bom-color-muted-fg: #94a3b8;
+  --bom-color-border: #334155;
+  --bom-color-ring: #60a5fa;
+  --bom-color-primary: #3b82f6;
+  --bom-color-primary-hover: #2563eb;
+  --bom-color-primary-fg: #ffffff;
+  --bom-color-danger: #ef4444;
+  --bom-color-danger-hover: #dc2626;
+  --bom-color-danger-fg: #ffffff;
+  --bom-color-success: #22c55e;
+  --bom-color-warning: #f59e0b;
+  --bom-color-info: #38bdf8;
+  --bom-shadow-sm: 0 1px 2px rgb(0 0 0 / 0.4);
+  --bom-shadow-md: 0 4px 12px rgb(0 0 0 / 0.5);
+}
