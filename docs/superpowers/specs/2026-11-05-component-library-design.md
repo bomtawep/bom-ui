@@ -25,7 +25,7 @@
 
 - `radix-ui` อยู่ใน `dependencies` (pin exact ด้วย `yarn add -E`) — tsup externalize `dependencies` ให้อัตโนมัติ ไม่ถูก bundle
 - `react`, `react-dom` เป็น `peerDependencies` (`>=18`) เหมือนเดิม — ไม่ import `next`
-- devDependencies ใหม่ (pin exact ตอนลงมือ): `vitest`, `jsdom`, `@testing-library/react`, `@testing-library/user-event`, `@testing-library/jest-dom`, `vitest-axe`, `storybook`, `@storybook/react-vite`, `vite`, `@vitejs/plugin-react`
+- devDependencies ใหม่ (pin exact ตอนลงมือ): `vitest`, `jsdom`, `@testing-library/react`, `@testing-library/user-event`, `@testing-library/jest-dom`, `axe-core` (helper `expectNoA11yViolations` เขียนเอง — `vitest-axe` ไม่ได้ maintain แล้ว), `storybook`, `@storybook/react-vite`, `vite`, `@vitejs/plugin-react`
 
 ### ข้อตกลง API
 
@@ -89,8 +89,8 @@ DataGrid (sort/filter/virtualize), DatePicker, Combobox, Command palette, form-l
 
 ### Vitest
 
-- `vitest.config.ts`: environment `jsdom`, setup file `vitest.setup.ts`
-- `vitest.setup.ts`: import `@testing-library/jest-dom/vitest`, ลงทะเบียน matcher ของ `vitest-axe`, polyfill `ResizeObserver`, `Element.prototype.hasPointerCapture` / `releasePointerCapture`, `Element.prototype.scrollIntoView` (Radix ต้องใช้)
+- `vite.config.ts` (ใช้ร่วมกับ Storybook): block `test` — environment `jsdom`, setup file `src/test-utils/setup.ts`
+- `src/test-utils/setup.ts`: import `@testing-library/jest-dom/vitest`, ลงทะเบียน matcher ของ `vitest-axe`, polyfill `ResizeObserver`, `Element.prototype.hasPointerCapture` / `releasePointerCapture`, `Element.prototype.scrollIntoView` (Radix ต้องใช้)
 - script: `"test": "vitest run"`, `"test:watch": "vitest"`
 
 ### Storybook
