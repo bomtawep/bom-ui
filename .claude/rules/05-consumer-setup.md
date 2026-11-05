@@ -120,6 +120,7 @@ npm และ Yarn 1 ใช้ `.npmrc` แทน `.yarnrc.yml`:
 |---|---|
 | `404 Not Found - @bomtawep/ui` | ไม่มี `npmScopes.bomtawep` ใน `.yarnrc.yml` (หรือใส่ไว้แค่ใน `.npmrc` ซึ่ง Yarn 4 ไม่อ่าน) / scope ไม่ตรง |
 | `401 Unauthorized` | `NPM_TOKEN` ไม่ได้ตั้ง / หมดอายุ / ไม่มี `read:packages` |
+| `permission_denied: The token provided does not match expected scopes` | token เป็น fine-grained PAT (ไม่รองรับ) หรือ classic PAT ที่ขาด scope — install ต้องมี `read:packages`, publish ต้องใช้ `GITHUB_TOKEN` ของ repo bom-ui |
 | หาเวอร์ชันล่าสุดไม่เจอ ทั้งที่ publish แล้ว | ติด age gate ของ Yarn ≥ 4.18 — ตั้ง `npmMinimalAgeGate: 0` ใต้ scope |
 | `Invalid hook call` | React ซ้ำ 2 ชุด — ตรวจว่า library ใส่ react เป็น peerDependency |
 | Error เรื่อง hooks ใน Server Component | bundle ขาด `'use client'` |

@@ -11,6 +11,8 @@
 
 ## Rules
 
+- workflow publish ของ bom-ui ต้องใช้ `secrets.GITHUB_TOKEN` เท่านั้น **ห้ามเปลี่ยนเป็น PAT** — PAT ที่มีแค่ `read:packages` หรือ fine-grained PAT (GitHub Packages npm registry ไม่รองรับ) จะ fail ด้วย `permission_denied: The token provided does not match expected scopes`
+- PAT `read:packages` (เช่น `BOM_UI_TOKEN` / `GH_PKG_TOKEN`) ใช้สำหรับ **install ในโปรเจกต์ปลายทาง** เท่านั้น และต้องเป็น **classic** PAT
 - **ห้าม** commit token ในไฟล์ใด ๆ — `.yarnrc.yml` ต้องใช้ `"${NPM_TOKEN:-}"` (และ `.npmrc` ถ้ามี ใช้ `${NPM_TOKEN}`) เท่านั้น
 - Yarn ≥ 4.18 ปิด install scripts ของ dependency เป็นค่าเริ่มต้น — อย่าเปิด `enableScripts: true` ทั้ง repo (tsup/esbuild ทำงานได้โดยไม่ต้องรัน install script)
 - **ห้าม** ใส่ token ใน `package.json` หรือ URL ของ dependency
