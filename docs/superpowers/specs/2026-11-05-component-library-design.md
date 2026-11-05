@@ -16,7 +16,7 @@
 |---|---|---|
 | Headless / a11y | Radix UI ผ่านแพ็กเกจรวม `radix-ui` | a11y (focus trap, keyboard, ARIA, positioning) ผ่านการทดสอบมาแล้ว tree-shake ได้ |
 | Styling | Plain CSS + CSS variables `--bom-*` | ต่อยอดของเดิม ปลายทางไม่ต้องมี Tailwind ปรับธีมด้วย override ตัวแปร |
-| Test | Vitest + Testing Library + `vitest-axe` | behavior + a11y อัตโนมัติ |
+| Test | Vitest + Testing Library + `axe-core` | behavior + a11y อัตโนมัติ |
 | Docs / playground | Storybook (`@storybook/react-vite`) | ดู variant / state / dark mode |
 
 ## 1. สถาปัตยกรรม
@@ -90,7 +90,7 @@ DataGrid (sort/filter/virtualize), DatePicker, Combobox, Command palette, form-l
 ### Vitest
 
 - `vite.config.ts` (ใช้ร่วมกับ Storybook): block `test` — environment `jsdom`, setup file `src/test-utils/setup.ts`
-- `src/test-utils/setup.ts`: import `@testing-library/jest-dom/vitest`, ลงทะเบียน matcher ของ `vitest-axe`, polyfill `ResizeObserver`, `Element.prototype.hasPointerCapture` / `releasePointerCapture`, `Element.prototype.scrollIntoView` (Radix ต้องใช้)
+- `src/test-utils/setup.ts`: import `@testing-library/jest-dom/vitest`, polyfill `ResizeObserver`, `Element.prototype.hasPointerCapture` / `releasePointerCapture`, `Element.prototype.scrollIntoView` (Radix ต้องใช้)
 - script: `"test": "vitest run"`, `"test:watch": "vitest"`
 
 ### Storybook
