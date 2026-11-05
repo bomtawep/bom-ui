@@ -33,4 +33,4 @@ jobs:
           fi
         env:
           # Read by .yarnrc.yml → npmScopes.bomtawep.npmAuthToken
-          NPM_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NPM_TOKEN: ${{ secrets.BOM_UI_TOKEN }}
