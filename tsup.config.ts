@@ -1,4 +1,3 @@
-import { existsSync } from 'node:fs'
 import { readdir, readFile, writeFile } from 'node:fs/promises'
 import { defineConfig } from 'tsup'
 
@@ -12,8 +11,14 @@ async function bundleCss() {
     .sort()
   const parts = [await readFile('src/styles/tokens.css', 'utf8')]
   for (const name of names) {
-    const file = `src/components/${name}/${name}.css`
-    if (existsSync(file)) parts.push(await readFile(file, 'utf8'))
+    const dir = `src/components/${name}`
+    const cssFiles = (await readdir(dir)).filter((f) => f.endsWith('.css'))
+    for (const file of cssFiles) {
+      if (file !== `${name}.css`) {
+        throw new Error(`${dir}/${file}: component CSS must be named ${name}.css to be bundled into dist/styles.css`)
+      }
+    }
+    if (cssFiles.includes(`${name}.css`)) parts.push(await readFile(`${dir}/${name}.css`, 'utf8'))
   }
   await writeFile('dist/styles.css', parts.join('\n'))
 }

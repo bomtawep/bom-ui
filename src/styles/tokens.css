@@ -67,6 +67,7 @@
   }
 }
 
+/* Keep in sync with the prefers-color-scheme block above (CSS cannot share one rule for both). */
 [data-theme='dark'] {
   color-scheme: dark;
   --bom-color-bg: #0b1120;
