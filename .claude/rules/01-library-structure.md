@@ -8,14 +8,24 @@ bom-ui/
 │   ├── ci.yml            # typecheck + build ทุก PR
 │   └── publish.yml       # publish เมื่อ push tag v*
 ├── .yarn/releases/yarn-4.18.1.cjs   # commit ไฟล์นี้ (pinned yarn)
-├── scripts/release.sh               # bump + commit + tag
+├── .storybook/                      # main.ts, preview.tsx (theme toolbar)
+├── scripts/
+│   ├── release.sh                   # bump + commit + tag
+│   ├── check-css.sh                 # component CSS ห้ามมีสี hardcode
+│   └── check-dist.sh                # 'use client' + styles.css หลัง build
 ├── src/
 │   ├── components/
 │   │   └── Button/
-│   │       ├── Button.tsx
+│   │       ├── Button.tsx           # 'use client' + forwardRef + displayName
+│   │       ├── Button.css           # bom-btn, bom-btn--<modifier> ใช้ var(--bom-*) เท่านั้น
+│   │       ├── Button.test.tsx      # Vitest + Testing Library + axe
+│   │       ├── Button.stories.tsx   # Storybook (default export meta ได้เฉพาะไฟล์นี้)
 │   │       └── index.ts
-│   ├── styles/           # (ถ้า ship CSS แยก)
-│   └── index.ts          # public API — export ทุกอย่างจากที่นี่
+│   ├── lib/cn.ts                    # internal helper (ไม่ export)
+│   ├── styles/tokens.css            # --bom-* tokens light/dark
+│   ├── test-utils/                  # setup.ts, axe.ts
+│   └── index.ts                     # public API — export ทุกอย่างจากที่นี่
+├── vite.config.ts                   # ใช้ร่วม Vitest + Storybook (ไม่เกี่ยวกับ tsup)
 ├── package.json
 ├── tsconfig.json
 ├── tsup.config.ts
@@ -31,6 +41,8 @@ bom-ui/
 - Pin เวอร์ชันผ่าน `yarnPath` (ไม่พึ่ง Corepack ซึ่งไม่ได้มากับ Node ตั้งแต่ v25) และ `packageManager: "yarn@4.18.1"` ใน package.json
 - อัปเกรด yarn: `yarn set version <x.y.z>` แล้ว commit ไฟล์ใน `.yarn/releases/` + `.yarnrc.yml` + `package.json`
 - เพิ่ม dependency: `yarn add -D -E <pkg>@<version>` (`-E` = exact)
+- `.yarnrc.yml` ตั้ง `tsEnableAutoTypes: false` เพื่อไม่ให้ `yarn add` เพิ่ม `@types/*` ด้วย caret range เอง (devDependencies ต้อง pin exact) — ถ้าต้องใช้ types ให้เพิ่มเองด้วย `yarn add -D -E @types/<pkg>@<version>`
+- Yarn ≥ 4.18 จะไม่ติดตั้งเวอร์ชันที่ publish มาไม่ถึง 1 วัน (age gate) — ถ้า pin เวอร์ชันที่ใหม่เกินไป install จะ fail ด้วย `YN0016 ... quarantined` ให้เลือกเวอร์ชันที่เก่ากว่า **ห้าม** ปิด gate ของ scope เริ่มต้น
 - CI ใช้ `yarn install --immutable` (ห้าม lockfile เปลี่ยน)
 
 ## Rules
@@ -39,6 +51,7 @@ bom-ui/
 - ทุก component ต้องถูก re-export จาก `src/index.ts` — สิ่งที่ไม่ export ถือเป็น internal
 - ใช้ named export เท่านั้น (ไม่ใช้ `export default`) เพื่อให้ tree-shaking ทำงานและ import ชื่อคงที่
 - Props ต้อง export type ด้วย เช่น `export type { ButtonProps } from './Button'`
+- ทุก component ใช้ `forwardRef` (peer รองรับ React 18) ตั้ง `displayName` รับ `className` + `...props` — Definition of Done ดู spec
 - ห้าม import จาก `next/*` ใน component ทั่วไป ถ้าจำเป็นต้องใช้ (เช่น `next/link`) ให้ `next` เป็น peerDependency และอยู่ใน `external`
 
 ## package.json (baseline)
@@ -112,15 +125,14 @@ export default defineConfig({
   clean: true,
   external: ['react', 'react-dom', 'next'],
   banner: { js: "'use client'" },
-  onSuccess: async () => {
-    await copyFile('src/styles/styles.css', 'dist/styles.css')
-  },
+  onSuccess: bundleCss,
 })
 ```
 
 - `external` ต้องครอบคลุมทุก peerDependency
+- `onSuccess: bundleCss` — รวม `src/styles/tokens.css` + `src/components/<Name>/<Name>.css` (เรียงตามชื่อ) เป็น `dist/styles.css` component ใหม่ไม่ต้องแก้ config แค่ตั้งชื่อไฟล์ CSS ให้ตรงชื่อโฟลเดอร์ — ถ้าโฟลเดอร์ component มีไฟล์ `.css` ที่ชื่อไม่ใช่ `<Name>.css` `bundleCss` จะ throw error (build fail)
 - **ห้ามใส่ `treeshake: true`** — option นี้ทำให้ tsup ส่งต่อให้ Rollup ซึ่งลบ `'use client'` ออกจาก bundle (esbuild tree-shake ESM ให้อยู่แล้ว) ตรวจหลัง build ว่าบรรทัดแรกของ `dist/index.js` เป็น `'use client'`
-- ใช้ tsup 8.x + TypeScript 5.x (tsup 9 ต้องการ Node ≥ 22)
+- ใช้ tsup 8.x + TypeScript 5.x; dev/CI ใช้ Node 22 (`.nvmrc`)
 - `banner` ใส่ `'use client'` ไว้บนสุดของ bundle (ดู [02-nextjs-compatibility.md](02-nextjs-compatibility.md))
 
 ## tsconfig.json (สำคัญ)

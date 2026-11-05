@@ -44,6 +44,30 @@ export default function Page() {
 }
 ```
 
+### Button
+
+```tsx
+<Button variant="primary" size="md">Save</Button>
+```
+
+- `variant`: `primary` (ค่าเริ่มต้น) | `secondary` | `ghost` | `danger`
+- `size`: `sm` | `md` (ค่าเริ่มต้น) | `lg`
+- รับ props ของ `<button>` ทั้งหมด และ `ref`
+
+## ธีม
+
+ทุกสีและขนาดเป็น CSS variable `--bom-*` override ได้ใน CSS ของโปรเจกต์:
+
+```css
+:root {
+  --bom-color-primary: #7c3aed;
+  --bom-color-primary-hover: #6d28d9;
+  --bom-radius-md: 0.75rem;
+}
+```
+
+Dark mode ตามระบบปฏิบัติการอัตโนมัติ บังคับได้ด้วย `<html data-theme="dark">` หรือ `data-theme="light"`
+
 ใช้ได้ทั้งใน Server Component และ Client Component (bundle มี `'use client'` อยู่แล้ว)
 
 CI / Docker: ดู [.claude/rules/05-consumer-setup.md](.claude/rules/05-consumer-setup.md)
@@ -51,8 +75,11 @@ CI / Docker: ดู [.claude/rules/05-consumer-setup.md](.claude/rules/05-consum
 ## พัฒนา
 
 ```bash
+nvm use          # Node 22 (.nvmrc)
 yarn install
 yarn dev         # tsup --watch
+yarn test        # vitest
+yarn storybook   # http://localhost:6006
 yarn typecheck
 yarn build
 ```

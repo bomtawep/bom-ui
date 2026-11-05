@@ -24,6 +24,9 @@ Library นี้คือ **React** component library ที่ต้องใ�
    // app/layout.tsx
    import '@bomtawep/ui/styles.css'
    ```
+   - สีและขนาดทั้งหมดมาจาก CSS variables ใน `src/styles/tokens.css` (`--bom-color-*`, `--bom-radius-*`, `--bom-space-*`, …) ปลายทาง override ได้ เช่น `:root { --bom-color-primary: #7c3aed; }`
+   - Dark mode ตาม OS อัตโนมัติ หรือบังคับด้วย `<html data-theme="dark">` / `data-theme="light"`
+   - CSS ของ component ห้ามมีสี hardcode — CI ตรวจด้วย `scripts/check-css.sh`
 2. **Tailwind** — ถ้าใช้ class ของ Tailwind ใน component ปลายทางต้องให้ Tailwind scan package ด้วย
    - Tailwind v4: `@source "../node_modules/@bomtawep/ui/dist";` ใน CSS
    - Tailwind v3: เพิ่ม `./node_modules/@bomtawep/ui/dist/**/*.{js,cjs}` ใน `content`

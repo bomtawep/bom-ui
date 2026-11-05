@@ -18,7 +18,8 @@ React component library สำหรับ Next.js (App Router + Pages Router) �
 | Build tool | `tsup` 8.x (ESM + CJS + `.d.ts`) |
 | Output | `dist/` (ไม่ commit — registry เก็บไฟล์ที่ build แล้ว) |
 | Release trigger | push git tag `v*` → GitHub Actions publish |
-| Node | 20 LTS |
+| Node | 22 LTS (dev/CI — `.nvmrc`); consumer ใช้ได้ตั้งแต่ 20 |
+| Test / Docs | Vitest + Testing Library + axe-core / Storybook 10 |
 
 ## Rules
 
@@ -30,6 +31,7 @@ React component library สำหรับ Next.js (App Router + Pages Router) �
 - [.claude/rules/04-registry-publish.md](.claude/rules/04-registry-publish.md) — GitHub Packages, publish workflow (CI)
 - [.claude/rules/05-consumer-setup.md](.claude/rules/05-consumer-setup.md) — วิธีติดตั้งในโปรเจกต์ปลายทาง (`.npmrc`, CI, Docker)
 - [.claude/rules/06-security-tokens.md](.claude/rules/06-security-tokens.md) — การจัดการ token / secret
+- [docs/superpowers/specs/2026-11-05-component-library-design.md](docs/superpowers/specs/2026-11-05-component-library-design.md) — แผนรวม component ทั้งชุด (5 ช่วง) และ Definition of Done
 
 ## Commands
 
@@ -38,6 +40,12 @@ yarn install         # ใช้ yarn ตัวไหนก็ได้ (แม�
 yarn build           # tsup → dist/
 yarn dev             # tsup --watch
 yarn typecheck       # tsc --noEmit
+yarn test            # vitest run
+yarn test:watch      # vitest
+yarn storybook       # http://localhost:6006
+yarn build-storybook
+sh scripts/check-css.sh   # component CSS ใช้ --bom-* เท่านั้น
+sh scripts/check-dist.sh  # 'use client' + styles.css หลัง build
 yarn pack --dry-run  # ดูไฟล์ที่จะ publish
 yarn release patch   # bump + commit + git tag (ดู 03-versioning-release)
 git push --follow-tags
