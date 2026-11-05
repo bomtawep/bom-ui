@@ -1,10 +1,10 @@
 /*
  * Design tokens. Override any --bom-* variable in the consuming app to theme the library.
- * Dark mode: follows the OS unless <html data-theme="light|dark"> forces one.
+ * Default is always light. Opt in with <html data-theme="dark">, <html data-theme="light">,
+ * or <html data-theme="system"> (follows the OS). :root deliberately sets no color-scheme.
  */
 :root,
 [data-theme='light'] {
-  color-scheme: light;
   --bom-color-bg: #ffffff;
   --bom-color-fg: #0f172a;
   --bom-color-muted: #f1f5f9;
@@ -44,30 +44,11 @@
   --bom-duration-fast: 150ms;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme='light']) {
-    color-scheme: dark;
-    --bom-color-bg: #0b1120;
-    --bom-color-fg: #e2e8f0;
-    --bom-color-muted: #1e293b;
-    --bom-color-muted-fg: #94a3b8;
-    --bom-color-border: #334155;
-    --bom-color-ring: #60a5fa;
-    --bom-color-primary: #3b82f6;
-    --bom-color-primary-hover: #2563eb;
-    --bom-color-primary-fg: #ffffff;
-    --bom-color-danger: #ef4444;
-    --bom-color-danger-hover: #dc2626;
-    --bom-color-danger-fg: #ffffff;
-    --bom-color-success: #22c55e;
-    --bom-color-warning: #f59e0b;
-    --bom-color-info: #38bdf8;
-    --bom-shadow-sm: 0 1px 2px rgb(0 0 0 / 0.4);
-    --bom-shadow-md: 0 4px 12px rgb(0 0 0 / 0.5);
-  }
+[data-theme='light'] {
+  color-scheme: light;
 }
 
-/* Keep in sync with the prefers-color-scheme block above (CSS cannot share one rule for both). */
+/* Keep in sync with the [data-theme='system'] block below (CSS cannot share one rule for both). */
 [data-theme='dark'] {
   color-scheme: dark;
   --bom-color-bg: #0b1120;
@@ -87,4 +68,27 @@
   --bom-color-info: #38bdf8;
   --bom-shadow-sm: 0 1px 2px rgb(0 0 0 / 0.4);
   --bom-shadow-md: 0 4px 12px rgb(0 0 0 / 0.5);
+}
+
+@media (prefers-color-scheme: dark) {
+  [data-theme='system'] {
+    color-scheme: dark;
+    --bom-color-bg: #0b1120;
+    --bom-color-fg: #e2e8f0;
+    --bom-color-muted: #1e293b;
+    --bom-color-muted-fg: #94a3b8;
+    --bom-color-border: #334155;
+    --bom-color-ring: #60a5fa;
+    --bom-color-primary: #3b82f6;
+    --bom-color-primary-hover: #2563eb;
+    --bom-color-primary-fg: #ffffff;
+    --bom-color-danger: #ef4444;
+    --bom-color-danger-hover: #dc2626;
+    --bom-color-danger-fg: #ffffff;
+    --bom-color-success: #22c55e;
+    --bom-color-warning: #f59e0b;
+    --bom-color-info: #38bdf8;
+    --bom-shadow-sm: 0 1px 2px rgb(0 0 0 / 0.4);
+    --bom-shadow-md: 0 4px 12px rgb(0 0 0 / 0.5);
+  }
 }

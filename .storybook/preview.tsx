@@ -9,7 +9,7 @@ const preview: Preview = {
   globalTypes: {
     theme: {
       description: 'Color theme (sets <html data-theme>)',
-      toolbar: { title: 'Theme', icon: 'mirror', items: ['light', 'dark'], dynamicTitle: true },
+      toolbar: { title: 'Theme', icon: 'mirror', items: ['light', 'dark', 'system'], dynamicTitle: true },
     },
   },
   initialGlobals: { theme: 'light' },

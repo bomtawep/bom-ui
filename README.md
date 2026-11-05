@@ -66,7 +66,15 @@ export default function Page() {
 }
 ```
 
-Dark mode ตามระบบปฏิบัติการอัตโนมัติ บังคับได้ด้วย `<html data-theme="dark">` หรือ `data-theme="light"`
+ค่าเริ่มต้นเป็น light เสมอ เปิด dark mode ด้วย `<html data-theme="dark">` หรือให้ตามระบบปฏิบัติการด้วย `<html data-theme="system">` (`data-theme="light"` บังคับ light)
+
+ถ้าใช้ next-themes ต้องตั้ง `attribute="data-theme"` (ค่าเริ่มต้น `attribute="class"` ใช้กับ tokens นี้ไม่ได้):
+
+```tsx
+<ThemeProvider attribute="data-theme" defaultTheme="system" enableSystem>
+  {children}
+</ThemeProvider>
+```
 
 ใช้ได้ทั้งใน Server Component และ Client Component (bundle มี `'use client'` อยู่แล้ว)
 

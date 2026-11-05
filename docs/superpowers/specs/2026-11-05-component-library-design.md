@@ -41,7 +41,7 @@
 ### Styling
 
 - `src/styles/tokens.css` — `--bom-color-*` (bg, fg, muted, border, primary, primary-fg, danger, success, warning, info, ring), `--bom-radius-*`, `--bom-space-*`, `--bom-font-*`, `--bom-shadow-*`
-- Dark mode: ค่าใน `@media (prefers-color-scheme: dark)` ภายใต้ `:root:not([data-theme="light"])` และซ้ำใน `[data-theme="dark"]` — ปลายทางบังคับโหมดได้ด้วย attribute `data-theme` บน `<html>`
+- Dark mode: เป็น opt-in — ค่าเริ่มต้นเป็น light เสมอ (`:root` ไม่ตั้ง `color-scheme`); `<html data-theme="dark">` ใช้ dark tokens, `data-theme="light"` บังคับ light, `data-theme="system"` ตาม OS ผ่าน `@media (prefers-color-scheme: dark)` (แก้ไขหลัง final review ของ Phase 1 เพื่อไม่ให้ consumer 0.1.5 เปลี่ยนหน้าตาเมื่ออัปเกรด minor)
 - CSS ต่อ component: `src/components/<Name>/<Name>.css` class รูปแบบ `bom-<name>`, `bom-<name>--<modifier>`; state ใช้ attribute ของ Radix (`[data-state="open"]`, `[data-disabled]`)
 - CSS ของ component ใช้ได้เฉพาะตัวแปร `--bom-*` — ห้ามสี hardcode นอก `tokens.css`
 - Build: `onSuccess` ใน `tsup.config.ts` รวม `tokens.css` + `src/components/*/*.css` (เรียงตามชื่อ) เป็น `dist/styles.css` ไฟล์เดียว — ปลายทาง import `@bomtawep/ui/styles.css` เหมือนเดิม; `src/styles/styles.css` เดิมถูกแทนที่

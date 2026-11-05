@@ -1,5 +1,4 @@
 import axe from 'axe-core'
-import { expect } from 'vitest'
 
 /**
  * Runs axe on a rendered fragment and fails with the list of violated rules.
@@ -13,5 +12,8 @@ export async function expectNoA11yViolations(container: Element): Promise<void> 
       region: { enabled: false },
     },
   })
-  expect(results.violations.map((v) => `${v.id}: ${v.help}`)).toEqual([])
+  const problems = results.violations.map((v) => `${v.id}: ${v.help} (${v.nodes.length} node(s))`)
+  if (problems.length > 0) {
+    throw new Error(`axe found ${problems.length} a11y violation(s):\n${problems.join('\n')}`)
+  }
 }

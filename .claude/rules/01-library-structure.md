@@ -5,7 +5,7 @@
 ```
 bom-ui/
 ├── .github/workflows/
-│   ├── ci.yml            # typecheck + build ทุก PR
+│   ├── ci.yml            # typecheck + test + build + checks + pack + storybook ทุก PR
 │   └── publish.yml       # publish เมื่อ push tag v*
 ├── .yarn/releases/yarn-4.18.1.cjs   # commit ไฟล์นี้ (pinned yarn)
 ├── .storybook/                      # main.ts, preview.tsx (theme toolbar)
@@ -66,9 +66,14 @@ bom-ui/
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.js",
-      "require": "./dist/index.cjs"
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
     },
     "./styles.css": "./dist/styles.css"
   },
@@ -106,7 +111,7 @@ bom-ui/
 
 ข้อกำหนด:
 - `files: ["dist"]` — publish เฉพาะไฟล์ที่ build แล้ว
-- `exports` ต้องมี `types` เป็น key แรกเสมอ
+- `exports` ต้องมี `types` เป็น key แรกเสมอ (ภายในแต่ละ condition `import` / `require` — ESM ใช้ `index.d.ts`, CJS ใช้ `index.d.cts`)
 - `repository.url` ต้องชี้ไปที่ repo นี้ — GitHub Packages ใช้ลิงก์ package เข้ากับ repo
 - ใน devDependencies ให้ pin เวอร์ชันจริง (ห้ามใช้ `"latest"`)
 - ใช้ `prepack` (ไม่ใช่ `prepublishOnly`) — Yarn 4 รัน `prepack` ทั้งตอน `yarn pack` และ `yarn npm publish` จึงรับประกันว่า `dist/` ใหม่เสมอ

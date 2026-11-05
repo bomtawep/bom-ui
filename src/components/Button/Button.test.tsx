@@ -40,6 +40,11 @@ describe('Button', () => {
     const ref = createRef<HTMLButtonElement>()
     render(<Button ref={ref}>Save</Button>)
     expect(ref.current).toBeInstanceOf(HTMLButtonElement)
+    expect(ref.current).toBe(screen.getByRole('button'))
+  })
+
+  it('is a forwardRef component (React 18 needs it for refs)', () => {
+    expect((Button as unknown as { $$typeof: symbol }).$$typeof).toBe(Symbol.for('react.forward_ref'))
   })
 
   it('calls onClick when clicked', async () => {

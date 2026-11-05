@@ -23,6 +23,7 @@ jobs:
             exit 1
           fi
       - run: yarn install --immutable
+      - run: yarn test
       # `yarn npm publish` runs the prepack script (typecheck + build) before packing.
       - name: Publish
         run: |

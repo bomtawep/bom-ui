@@ -60,6 +60,7 @@ jobs:
           PKG_VERSION="v$(node -p "require('./package.json').version")"
           [ "$PKG_VERSION" = "$GITHUB_REF_NAME" ] || exit 1
       - run: yarn install --immutable
+      - run: yarn test
       - name: Publish                       # prepack = typecheck + build
         run: |
           if [[ "$GITHUB_REF_NAME" == *-* ]]; then
@@ -79,7 +80,7 @@ Rules:
 
 ## `.github/workflows/ci.yml` (ทุก PR)
 
-ต้องรัน `yarn install --immutable` → `yarn typecheck` → `yarn build` และ `yarn pack --dry-run` เพื่อตรวจว่าไฟล์ที่จะ publish ครบ (มี `dist/`, ไม่มี `src/` หรือไฟล์ลับ)
+ต้องรัน `yarn install --immutable` → `yarn typecheck` → `yarn test` → `yarn build` → `check-dist.sh` → `check-css.sh` → `yarn pack --dry-run` → `yarn build-storybook` เพื่อตรวจว่าไฟล์ที่จะ publish ครบ (มี `dist/`, ไม่มี `src/` หรือไฟล์ลับ)
 
 ## การมองเห็น package
 
