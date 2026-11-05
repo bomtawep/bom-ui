@@ -36,4 +36,4 @@ jobs:
           # Must be GITHUB_TOKEN (gets packages: write from the permissions block above).
           # A PAT with only read:packages, or any fine-grained PAT, fails with
           # "permission_denied: The token provided does not match expected scopes".
-          NPM_TOKEN: ${{ secrets.UI_TOKEN }}
+          NPM_TOKEN: ${{ secrets.GITHUB_TOKEN }}
