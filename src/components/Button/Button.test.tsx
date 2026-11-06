@@ -21,7 +21,7 @@ describe('Button', () => {
     expect(screen.getByRole('button')).toHaveClass('bom-btn', 'bom-btn--primary', 'bom-btn--md')
   })
 
-  it.each(['primary', 'secondary', 'ghost', 'danger'] as const)('applies the %s variant class', (variant) => {
+  it.each(['primary', 'secondary', 'ghost', 'danger', 'sparkle'] as const)('applies the %s variant class', (variant) => {
     render(<Button variant={variant}>Save</Button>)
     expect(screen.getByRole('button')).toHaveClass(`bom-btn--${variant}`)
   })
@@ -71,6 +71,11 @@ describe('Button', () => {
 
   it('has no a11y violations', async () => {
     const { container } = render(<Button>Save</Button>)
+    await expectNoA11yViolations(container)
+  })
+
+  it('has no a11y violations for the sparkle variant', async () => {
+    const { container } = render(<Button variant="sparkle">Get started</Button>)
     await expectNoA11yViolations(container)
   })
 })

@@ -50,7 +50,7 @@ export default function Page() {
 <Button variant="primary" size="md">Save</Button>
 ```
 
-- `variant`: `primary` (ค่าเริ่มต้น) | `secondary` | `ghost` | `danger`
+- `variant`: `primary` (ค่าเริ่มต้น) | `secondary` | `ghost` | `danger` | `sparkle` (gradient เคลื่อนไหว + แสงวาบตอน hover สำหรับ CTA — หยุดเมื่อผู้ใช้ตั้ง reduced motion; เปลี่ยนสีได้ด้วย `--bom-color-sparkle-1/2/3`)
 - `size`: `sm` | `md` (ค่าเริ่มต้น) | `lg`
 - รับ props ของ `<button>` ทั้งหมด และ `ref`
 

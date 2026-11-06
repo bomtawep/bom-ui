@@ -20,6 +20,12 @@
   --bom-color-success: #16a34a;
   --bom-color-warning: #d97706;
   --bom-color-info: #0284c7;
+  /* sparkle variant — same in every theme; override to use brand colors */
+  --bom-color-sparkle-1: #7c3aed;
+  --bom-color-sparkle-2: #db2777;
+  --bom-color-sparkle-3: #ea580c;
+  --bom-color-sparkle-fg: #ffffff;
+  --bom-color-sparkle-shine: rgb(255 255 255 / 0.55);
 
   --bom-radius-sm: 0.25rem;
   --bom-radius-md: 0.375rem;

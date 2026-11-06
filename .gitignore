@@ -10,3 +10,6 @@ storybook-static/
 .yarn/*
 !.yarn/releases
 .pnp.*
+
+# Scratch workspace for superpowers brainstorming / subagent runs
+.superpowers/
