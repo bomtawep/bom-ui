@@ -71,3 +71,54 @@
 .bom-btn--danger:hover:not(:disabled) {
   background: var(--bom-color-danger-hover);
 }
+
+/* sparkle — animated aurora gradient + shine sweep on hover */
+.bom-btn--sparkle {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  background: linear-gradient(
+    110deg,
+    var(--bom-color-sparkle-1),
+    var(--bom-color-sparkle-2),
+    var(--bom-color-sparkle-3),
+    var(--bom-color-sparkle-1)
+  );
+  background-size: 300% 100%;
+  color: var(--bom-color-sparkle-fg);
+  animation: bom-btn-aurora 6s linear infinite;
+}
+
+.bom-btn--sparkle::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(105deg, transparent 35%, var(--bom-color-sparkle-shine) 50%, transparent 65%);
+  transform: translateX(-120%);
+  pointer-events: none;
+}
+
+.bom-btn--sparkle:hover:not(:disabled)::after {
+  transform: translateX(120%);
+  transition: transform 0.7s ease;
+}
+
+.bom-btn--sparkle:disabled {
+  animation: none;
+}
+
+@keyframes bom-btn-aurora {
+  to {
+    background-position: 300% 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bom-btn--sparkle {
+    animation: none;
+  }
+
+  .bom-btn--sparkle::after {
+    display: none;
+  }
+}

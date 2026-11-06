@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { Button, type ButtonSize, type ButtonVariant } from './Button'
 
-const variants: ButtonVariant[] = ['primary', 'secondary', 'ghost', 'danger']
+const variants: ButtonVariant[] = ['primary', 'secondary', 'ghost', 'danger', 'sparkle']
 const sizes: ButtonSize[] = ['sm', 'md', 'lg']
 
 // Storybook requires a default export for meta; the library itself uses named exports only.
