@@ -18,7 +18,7 @@ describe('RHFInputGroup', () => {
     )
     const input = screen.getByRole('textbox', { name: 'Price' })
     expect(input).toHaveAccessibleDescription('฿ THB')
-    expect(input).toHaveClass('bom-input-group__control')
+    expect(input).toHaveAttribute('data-slot', 'input-group-control')
     await userEvent.type(input, '100')
     expect(form.methods!.getValues('price')).toBe('100')
   })
@@ -52,7 +52,7 @@ describe('RHFInputGroup', () => {
     )
     await userEvent.type(screen.getByTestId('custom'), '9')
     expect(form.methods!.getValues('price')).toBe('9')
-    expect(screen.getByTestId('custom')).toHaveClass('bom-input-group__control')
+    expect(screen.getByTestId('custom')).toHaveAttribute('data-slot', 'input-group-control')
   })
 
   it('shows the error after the addons in the description', async () => {

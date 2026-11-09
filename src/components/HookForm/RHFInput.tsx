@@ -1,38 +1,51 @@
-'use client'
+"use client"
 
-import { useEffect, useRef, type ChangeEvent, type ReactNode } from 'react'
-import { useController, useFormContext, type FieldPath, type FieldValues } from 'react-hook-form'
-import { useFieldIds } from '../../lib/use-field-ids'
-import { ButtonGroup } from '../ButtonGroup/ButtonGroup'
-import { Field, FieldContent, FieldDescription, FieldError, FieldLabel } from '../Field/Field'
-import { Input, type InputProps } from '../Input/Input'
-import { InputGroup, InputGroupAddon, InputGroupInput } from '../InputGroup/InputGroup'
-import { RequiredMark } from './RequiredMark'
+import * as React from "react"
+import { cn } from "cn"
+import {
+  useController,
+  useFormContext,
+  type FieldPath,
+  type FieldValues,
+} from "react-hook-form"
+
+import { ButtonGroup } from "../ButtonGroup/ButtonGroup"
+import {
+  Field,
+  FieldContent,
+  FieldDescription,
+  FieldError,
+  FieldLabel,
+} from "../Field/Field"
+import { Input } from "../Input/Input"
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupInput,
+} from "../InputGroup/InputGroup"
 
 export type RHFInputProps<TFieldValues extends FieldValues = FieldValues> = Omit<
-  InputProps,
-  'name' | 'value' | 'defaultValue' | 'onChange' | 'onBlur' | 'id'
+  React.ComponentProps<typeof Input>,
+  "name" | "value" | "defaultValue" | "onChange" | "onBlur" | "ref" | "id"
 > & {
   name: FieldPath<TFieldValues>
-  /** Always required: it names the field for screen readers. Hide it visually with hideLabel. */
-  label: ReactNode
+  // ต้องมีเสมอเพื่อเป็นชื่อของช่องให้ screen reader ถ้าไม่อยากให้เห็นใช้ hideLabel
+  label: React.ReactNode
   hideLabel?: boolean
-  /** Appended inside the label, e.g. a "Beta" badge (read as part of the field name). */
-  labelExtra?: ReactNode
-  description?: ReactNode
-  /** 'top' = between label and input, 'bottom' = below the input (default). */
-  descriptionPosition?: 'top' | 'bottom'
-  /** 'horizontal' = label on the left, input on the right. */
-  orientation?: 'vertical' | 'horizontal'
-  /**
-   * Text/icon/small button inside the same box (InputGroup), e.g. "https://".
-   * Addon text is not part of the field name — put anything important in the label or description too.
-   */
-  startAddon?: ReactNode
-  endAddon?: ReactNode
-  /** A control after the input, e.g. a Search button. */
-  append?: ReactNode
-  /** true = joined to the input (ButtonGroup), false = separated by a gap. */
+  // ต่อท้าย label เช่น <Badge>Beta</Badge> (อยู่ใน label จึงถูกอ่านเป็นส่วนหนึ่งของชื่อช่อง)
+  labelExtra?: React.ReactNode
+  description?: React.ReactNode
+  // "top" = ระหว่าง label กับช่อง, "bottom" = ใต้ช่อง (ค่าเริ่มต้น)
+  descriptionPosition?: "top" | "bottom"
+  // "horizontal" = label อยู่ซ้าย ช่องอยู่ขวา (ตัวอย่าง Inline ในเอกสาร shadcn)
+  orientation?: "vertical" | "horizontal"
+  // ใส่ข้อความ/ไอคอน/ปุ่มเล็กไว้ในกรอบเดียวกับช่อง (InputGroup) เช่น "https://"
+  // ข้อความใน addon ไม่ได้เป็นชื่อช่อง ถ้าสำคัญต่อการกรอกให้เขียนไว้ใน label หรือ description ด้วย
+  startAddon?: React.ReactNode
+  endAddon?: React.ReactNode
+  // ปุ่มหรือตัวควบคุมต่อท้ายช่อง เช่นปุ่ม Search
+  append?: React.ReactNode
+  // true = ติดกับช่องเป็นก้อนเดียว (ButtonGroup), false = เว้นระยะ (Inline)
   attachAppend?: boolean
   fieldClassName?: string
 }
@@ -43,8 +56,8 @@ export function RHFInput<TFieldValues extends FieldValues = FieldValues>({
   hideLabel,
   labelExtra,
   description,
-  descriptionPosition = 'bottom',
-  orientation = 'vertical',
+  descriptionPosition = "bottom",
+  orientation = "vertical",
   startAddon,
   endAddon,
   append,
@@ -57,17 +70,25 @@ export function RHFInput<TFieldValues extends FieldValues = FieldValues>({
 }: RHFInputProps<TFieldValues>) {
   const { control } = useFormContext<TFieldValues>()
   const { field, fieldState } = useController({ name, control })
+  // useId กัน id ชนเมื่อ name เดียวกันอยู่หลายที่ในหน้า (เช่น form ใน dialog + หน้าที่ซ่อนด้วย <Activity>)
+  const uid = React.useId()
+  const fieldId = `rhf-input-${name}-${uid}`
+  const isFile = type === "file"
+  const inputRef = React.useRef<HTMLInputElement>(null)
+
+  // input type="file" ควบคุมค่าไม่ได้ (value อ่านอย่างเดียว) เมื่อฟอร์ม reset แล้วค่าว่าง ต้องล้างไฟล์ที่เลือกค้างไว้เอง
+  const fileCount = isFile && Array.isArray(field.value) ? field.value.length : 0
+  React.useEffect(() => {
+    if (isFile && fileCount === 0 && inputRef.current) inputRef.current.value = ""
+  }, [isFile, fileCount])
+
   const invalid = fieldState.invalid
   const isDisabled = disabled || field.disabled
-  const { fieldId, descriptionId, errorId, describedBy } = useFieldIds('rhf-input', name, { description, invalid })
-  const isFile = type === 'file'
-  const inputRef = useRef<HTMLInputElement | null>(null)
-
-  // A file input's value is read-only; when the form resets to empty, clear the chosen files by hand
-  const fileCount = isFile && Array.isArray(field.value) ? field.value.length : 0
-  useEffect(() => {
-    if (isFile && fileCount === 0 && inputRef.current) inputRef.current.value = ''
-  }, [isFile, fileCount])
+  const descriptionId = `${fieldId}-description`
+  const errorId = `${fieldId}-error`
+  // ให้ screen reader อ่านคำอธิบายและข้อความ error ต่อจากชื่อช่อง
+  const describedBy =
+    [description && descriptionId, invalid && errorId].filter(Boolean).join(" ") || undefined
 
   const controlProps = {
     ...inputProps,
@@ -78,20 +99,23 @@ export function RHFInput<TFieldValues extends FieldValues = FieldValues>({
       field.ref(el)
     },
     name: field.name,
-    // file inputs store File[] (empty = []); everything else stores a string
+    // file: เก็บเป็น File[] (ว่าง = []) ช่องอื่นเก็บเป็น string
     ...(isFile
-      ? { onChange: (e: ChangeEvent<HTMLInputElement>) => field.onChange(Array.from(e.target.files ?? [])) }
-      : { value: field.value ?? '', onChange: field.onChange }),
+      ? {
+          onChange: (e: React.ChangeEvent<HTMLInputElement>) =>
+            field.onChange(Array.from(e.target.files ?? [])),
+        }
+      : { value: field.value ?? "", onChange: field.onChange }),
     onBlur: field.onBlur,
     disabled: isDisabled,
     required,
-    'aria-invalid': invalid,
-    'aria-describedby': describedBy,
+    "aria-invalid": invalid,
+    "aria-describedby": describedBy,
   }
 
   let controlEl =
     startAddon || endAddon ? (
-      <InputGroup data-disabled={isDisabled || undefined}>
+      <InputGroup>
         <InputGroupInput {...controlProps} />
         {startAddon && <InputGroupAddon align="inline-start">{startAddon}</InputGroupAddon>}
         {endAddon && <InputGroupAddon align="inline-end">{endAddon}</InputGroupAddon>}
@@ -101,12 +125,12 @@ export function RHFInput<TFieldValues extends FieldValues = FieldValues>({
     )
   if (append) {
     controlEl = attachAppend ? (
-      <ButtonGroup className="bom-button-group--full">
+      <ButtonGroup className="w-full">
         {controlEl}
         {append}
       </ButtonGroup>
     ) : (
-      <div className="bom-field__append">
+      <div className="flex w-full items-center gap-2">
         {controlEl}
         {append}
       </div>
@@ -114,16 +138,30 @@ export function RHFInput<TFieldValues extends FieldValues = FieldValues>({
   }
 
   const labelEl = (
-    <FieldLabel htmlFor={fieldId} className={hideLabel ? 'bom-sr-only' : undefined}>
+    <FieldLabel
+      htmlFor={fieldId}
+      className={cn(
+        hideLabel && "sr-only",
+        // horizontal: Field ให้ label ขยาย (flex-auto) จนช่องเหลือนิดเดียว จึงล็อกความกว้าง (ต้อง ! เพราะ selector ของ Field เจาะจงกว่า) และจัดให้ตรงกลางความสูงของช่อง
+        orientation === "horizontal" && "h-8 flex-none! items-center"
+      )}
+    >
       {label}
-      {required && <RequiredMark />}
+      {/* ช่องบังคับ: ใส่ * ให้เห็น แต่ซ่อนจาก screen reader เพราะ input required ประกาศ "required" อยู่แล้ว */}
+      {required && (
+        <span aria-hidden="true" className="text-destructive">
+          *
+        </span>
+      )}
       {labelExtra}
     </FieldLabel>
   )
-  const descriptionEl = description && <FieldDescription id={descriptionId}>{description}</FieldDescription>
+  const descriptionEl = description && (
+    <FieldDescription id={descriptionId}>{description}</FieldDescription>
+  )
   const errorEl = invalid && <FieldError id={errorId} errors={[fieldState.error]} />
 
-  if (orientation === 'horizontal') {
+  if (orientation === "horizontal") {
     return (
       <Field
         orientation="horizontal"
@@ -132,10 +170,10 @@ export function RHFInput<TFieldValues extends FieldValues = FieldValues>({
         className={fieldClassName}
       >
         {labelEl}
-        <FieldContent>
-          {descriptionPosition === 'top' && descriptionEl}
+        <FieldContent className="gap-1.5">
+          {descriptionPosition === "top" && descriptionEl}
           {controlEl}
-          {descriptionPosition === 'bottom' && descriptionEl}
+          {descriptionPosition === "bottom" && descriptionEl}
           {errorEl}
         </FieldContent>
       </Field>
@@ -143,11 +181,15 @@ export function RHFInput<TFieldValues extends FieldValues = FieldValues>({
   }
 
   return (
-    <Field data-invalid={invalid || undefined} data-disabled={isDisabled || undefined} className={fieldClassName}>
+    <Field
+      data-invalid={invalid || undefined}
+      data-disabled={isDisabled || undefined}
+      className={fieldClassName}
+    >
       {labelEl}
-      {descriptionPosition === 'top' && descriptionEl}
+      {descriptionPosition === "top" && descriptionEl}
       {controlEl}
-      {descriptionPosition === 'bottom' && descriptionEl}
+      {descriptionPosition === "bottom" && descriptionEl}
       {errorEl}
     </Field>
   )

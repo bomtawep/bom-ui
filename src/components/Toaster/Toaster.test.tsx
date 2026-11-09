@@ -6,40 +6,25 @@ afterEach(() => {
   act(() => {
     toast.dismiss()
   })
-  delete document.documentElement.dataset.theme
+  document.documentElement.classList.remove('dark')
 })
 
 describe('Toaster', () => {
   it('shows a toast fired with toast()', async () => {
     render(<Toaster />)
     act(() => {
-      toast('Saved')
+      toast.success('Saved')
     })
-    const el = await screen.findByText('Saved')
-    expect(el.closest('.bom-toast')).toBeInTheDocument()
+    expect(await screen.findByText('Saved')).toBeInTheDocument()
   })
 
-  it('maps toast types to bom classes', async () => {
+  it('follows class="dark" on <html>', async () => {
+    document.documentElement.classList.add('dark')
     render(<Toaster />)
-    act(() => {
-      toast.error('Oops')
-    })
-    expect((await screen.findByText('Oops')).closest('.bom-toast--danger')).toBeInTheDocument()
-  })
-
-  it('follows <html data-theme>', async () => {
-    document.documentElement.dataset.theme = 'dark'
-    const { container } = render(<Toaster />)
     act(() => {
       toast('x')
     })
     await screen.findByText('x')
-    const toaster = (container.ownerDocument.querySelector('[data-sonner-toaster]') as HTMLElement)!
-    expect(toaster).toHaveAttribute('data-sonner-theme', 'dark')
-    expect(toaster).toHaveClass('bom-toaster')
-  })
-
-  it('has a displayName', () => {
-    expect(Toaster.displayName).toBe('Toaster')
+    expect(document.querySelector('[data-sonner-toaster]')).toHaveAttribute('data-sonner-theme', 'dark')
   })
 })

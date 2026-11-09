@@ -1,59 +1,84 @@
-'use client'
+"use client"
 
-import { useRef, useState, type ReactNode } from 'react'
-import type { Matcher } from 'react-day-picker'
-import type { DayPickerLocale } from 'react-day-picker/locale'
-import { useController, useFormContext, type FieldPath, type FieldValues } from 'react-hook-form'
-import { cn } from '../../lib/cn'
-import { formatDateDisplay, formatDateInput, isValidDate, parseDateInput, sameDate } from '../../lib/date'
-import { CalendarIcon } from '../../lib/icons'
-import { useFieldIds } from '../../lib/use-field-ids'
-import { useTransientState } from '../../lib/use-transient-state'
-import { useBomUI } from '../BomUIProvider/BomUIProvider'
-import { Button } from '../Button/Button'
-import { Calendar } from '../Calendar/Calendar'
-import { Field, FieldDescription, FieldError, FieldLabel } from '../Field/Field'
-import { Input } from '../Input/Input'
-import { InputGroup, InputGroupAddon, InputGroupButton, InputGroupInput } from '../InputGroup/InputGroup'
-import { Popover, PopoverAnchor, PopoverContent, PopoverTrigger } from '../Popover/Popover'
-import { RequiredMark } from './RequiredMark'
+import * as React from "react"
+import { cn } from "cn"
+import { CalendarIcon } from "lucide-react"
+import type { Matcher } from "react-day-picker"
+import type { DayPickerLocale } from "react-day-picker/locale"
+import {
+  useController,
+  useFormContext,
+  type FieldPath,
+  type FieldValues,
+} from "react-hook-form"
+
+import { Button } from "../Button/Button"
+import { Calendar } from "../Calendar/Calendar"
+import {
+  Field,
+  FieldDescription,
+  FieldError,
+  FieldLabel,
+} from "../Field/Field"
+import { Input } from "../Input/Input"
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupButton,
+  InputGroupInput,
+} from "../InputGroup/InputGroup"
+import {
+  Popover,
+  PopoverAnchor,
+  PopoverContent,
+  PopoverTrigger,
+} from "../Popover/Popover"
+import { useTransientState } from "../../lib/use-transient-state"
+import { useBomUI } from "../BomUIProvider/BomUIProvider"
+
+import {
+  calendarLocaleProps,
+  formatDateDisplay,
+  formatDateInput,
+  isValidDate,
+  parseDateInput,
+  sameDate,
+} from "../../lib/date"
 
 export type RHFDatePickerProps<TFieldValues extends FieldValues = FieldValues> = {
   name: FieldPath<TFieldValues>
-  /** Always required: it names the field for screen readers. Hide it visually with hideLabel. */
-  label: ReactNode
+  // ต้องมีเสมอเพื่อเป็นชื่อของช่องให้ screen reader ถ้าไม่อยากให้เห็นใช้ hideLabel
+  label: React.ReactNode
   hideLabel?: boolean
-  description?: ReactNode
+  description?: React.ReactNode
   placeholder?: string
-  /** 'button' = a button opens the calendar; 'input' = type the date, with a calendar button at the end. */
-  variant?: 'button' | 'input'
-  /** Default: the BomUIProvider locale (Thai, Buddhist-era years). */
+  // "button" = ปุ่มเปิดปฏิทิน (Basic, Date of Birth), "input" = พิมพ์วันที่เองได้ + ปุ่มปฏิทินท้ายช่อง (Input, Natural Language)
+  variant?: "button" | "input"
+  // ค่าเริ่มต้นภาษาไทย ปี พ.ศ. ส่ง locale อื่นจาก "react-day-picker/locale" ได้ เช่น enUS
   locale?: DayPickerLocale
-  /** Button text (variant="button"). Default e.g. "29 ต.ค. 2569". */
+  // ข้อความบนปุ่ม (variant="button") ค่าเริ่มต้น "29 ต.ค. 2569"
   formatValue?: (date: Date) => string
-  /** Text box value (variant="input"). Default e.g. "29/10/2569". */
+  // ข้อความในช่อง (variant="input") ค่าเริ่มต้น "29/10/2569"
   formatInput?: (date: Date) => string
-  /**
-   * Parses typed text (variant="input"). Return undefined = empty, Invalid Date = wrong format
-   * (left in the form so the schema reports it). Default: dd/mm/yyyy in locale order, B.E. or C.E.
-   */
+  // แปลงข้อความที่พิมพ์ (variant="input") คืน undefined = ว่าง, Invalid Date = รูปแบบผิด (ให้ zod แจ้ง error)
+  // ค่าเริ่มต้นรับ วว/ดด/ปปปป ตามลำดับของ locale ปี พ.ศ. หรือ ค.ศ.
   parseInput?: (text: string) => Date | undefined
-  /** Re-format the text on blur (turn off e.g. for natural-language input). Default true. */
+  // ออกจากช่องแล้วจัดข้อความใหม่ตาม formatInput (ปิดได้ เช่น natural language ที่อยากเก็บคำที่พิมพ์ไว้)
   reformatOnBlur?: boolean
-  /** 'dropdown' = month/year dropdowns (e.g. date of birth); use with startMonth / endMonth. */
-  captionLayout?: 'label' | 'dropdown' | 'dropdown-months' | 'dropdown-years'
+  // "dropdown" = เลือกเดือน/ปีจาก dropdown (Date of Birth) ใช้คู่กับ startMonth/endMonth
+  captionLayout?: "label" | "dropdown" | "dropdown-months" | "dropdown-years"
   startMonth?: Date
   endMonth?: Date
-  /** Days that cannot be picked, e.g. { after: new Date() } = no future dates. */
+  // วันที่เลือกไม่ได้ เช่น { after: new Date() } = ห้ามเลือกวันในอนาคต
   disabledDates?: Matcher | Matcher[]
-  /** Close the calendar after picking a day. Default true. */
+  // เลือกวันแล้วปิดปฏิทิน
   closeOnSelect?: boolean
-  /** Adds a time box; the form value is a Date with the time set. */
+  // Time Picker: เพิ่มช่องเวลา ค่าในฟอร์มเป็น Date ที่มีเวลาด้วย
   showTime?: boolean
-  timeLabel?: ReactNode
-  /** Seconds, like input type="time" step. 60 (default) = hh:mm, 1 = with seconds. */
+  timeLabel?: React.ReactNode
+  // วินาที (เหมือน step ของ input type="time") ค่าเริ่มต้น 60 = ชั่วโมง:นาที, 1 = มีวินาที
   timeStep?: number
-  /** Accessible name of the icon-only calendar button (variant="input"). */
+  // ชื่อปุ่มเปิดปฏิทินของ variant="input" (ปุ่มมีแต่ไอคอน)
   calendarButtonLabel?: string
   disabled?: boolean
   required?: boolean
@@ -61,14 +86,14 @@ export type RHFDatePickerProps<TFieldValues extends FieldValues = FieldValues> =
   triggerClassName?: string
 }
 
-const pad = (n: number) => String(n).padStart(2, '0')
+const pad = (n: number) => String(n).padStart(2, "0")
 
 function toTime(d: Date, seconds: boolean) {
-  return `${pad(d.getHours())}:${pad(d.getMinutes())}${seconds ? `:${pad(d.getSeconds())}` : ''}`
+  return `${pad(d.getHours())}:${pad(d.getMinutes())}${seconds ? `:${pad(d.getSeconds())}` : ""}`
 }
 
 function withTime(d: Date, time: string) {
-  const [h = 0, m = 0, s = 0] = time.split(':').map(Number)
+  const [h = 0, m = 0, s = 0] = time.split(":").map(Number)
   const next = new Date(d)
   next.setHours(h, m, s, 0)
   return next
@@ -80,7 +105,7 @@ export function RHFDatePicker<TFieldValues extends FieldValues = FieldValues>({
   hideLabel,
   description,
   placeholder,
-  variant = 'button',
+  variant = "button",
   locale: localeProp,
   formatValue,
   formatInput,
@@ -100,20 +125,23 @@ export function RHFDatePicker<TFieldValues extends FieldValues = FieldValues>({
   className,
   triggerClassName,
 }: RHFDatePickerProps<TFieldValues>) {
+  // locale and strings default to BomUIProvider (Thai, Buddhist-era years)
   const { locale: providerLocale, messages } = useBomUI()
   const locale = localeProp ?? providerLocale
   const { control } = useFormContext<TFieldValues>()
   const { field, fieldState } = useController({ name, control })
+  // แยก ref/onBlur ออกมาก่อน (ส่ง field.ref ตรงๆ ลง ref ของปุ่ม แล้ว lint react-hooks/refs เข้าใจว่า field ทั้งก้อนเป็น ref)
   const { ref: fieldRef, onBlur: fieldOnBlur } = field
-  const invalid = fieldState.invalid
-  const isDisabled = disabled || field.disabled
-  const { fieldId, labelId, valueId, descriptionId, errorId, describedBy } = useFieldIds('rhf-date-picker', name, {
-    description,
-    invalid,
-  })
+  // useId กัน id ชนเมื่อ name เดียวกันอยู่หลายที่ในหน้า (เช่น form ใน dialog + หน้าที่ซ่อนด้วย <Activity>)
+  const uid = React.useId()
+  const fieldId = `rhf-date-picker-${name}-${uid}`
+  const labelId = `${fieldId}-label`
+  const valueId = `${fieldId}-value`
   const timeId = `${fieldId}-time`
-  const inputRef = useRef<HTMLInputElement | null>(null)
-  // a popover could stay open on a page hidden by <Activity>, so reset it when hidden
+  const descriptionId = `${fieldId}-description`
+  const errorId = `${fieldId}-error`
+  const inputRef = React.useRef<HTMLInputElement>(null)
+  // popover เปิดค้างได้ถ้าหน้าถูกซ่อนด้วย <Activity> จึงใช้ useTransientState (FE-STATE-7)
   const [open, setOpen] = useTransientState(false)
 
   const value = field.value as Date | null | undefined
@@ -122,38 +150,61 @@ export function RHFDatePicker<TFieldValues extends FieldValues = FieldValues>({
   const fmtInput = formatInput ?? ((d: Date) => formatDateInput(d, locale))
   const parse = parseInput ?? ((t: string) => parseDateInput(t, locale))
 
-  // Text box keeps what the user typed until the form value changes elsewhere (calendar, reset)
-  const [text, setText] = useState(() => (date ? fmtInput(date) : ''))
-  // a time chosen before any date applies to the date picked later
+  // ข้อความในช่องพิมพ์: ตามที่ผู้ใช้พิมพ์ จนกว่าค่าในฟอร์มจะเปลี่ยนจากที่อื่น (เลือกจากปฏิทิน, reset) จึงจัดข้อความใหม่
+  const [text, setText] = React.useState(() => (date ? fmtInput(date) : ""))
+  // เวลาที่เลือกไว้ก่อนเลือกวัน จะใช้กับวันที่เลือกทีหลัง
   const seconds = timeStep % 60 !== 0
-  const emptyTime = seconds ? '00:00:00' : '00:00'
-  const [timeDraft, setTimeDraft] = useState(emptyTime)
+  const emptyTime = seconds ? "00:00:00" : "00:00"
+  const [timeDraft, setTimeDraft] = React.useState(emptyTime)
 
-  const [syncedValue, setSyncedValue] = useState(value)
+  const [syncedValue, setSyncedValue] = React.useState(value)
   if (!sameDate(value, syncedValue)) {
     setSyncedValue(value)
-    setText(date ? fmtInput(date) : '')
-    // cleared from outside (e.g. reset): clear the pending time too
+    setText(date ? fmtInput(date) : "")
+    // ค่าถูกล้างจากภายนอก (เช่น reset) ล้างเวลาที่ค้างไว้ด้วย
     if (!date) setTimeDraft(emptyTime)
   }
   const time = date ? toTime(date, seconds) : timeDraft
+
+  const invalid = fieldState.invalid
+  const isDisabled = disabled || field.disabled
+  // ให้ screen reader อ่านคำอธิบายและข้อความ error ต่อจากชื่อช่อง
+  const describedBy =
+    [description && descriptionId, invalid && errorId].filter(Boolean).join(" ") || undefined
 
   const selectDate = (d: Date | undefined) => {
     field.onChange(d ? (showTime ? withTime(d, time) : d) : null)
     if (closeOnSelect) setOpen(false)
   }
 
+  const calendar = (
+    <Calendar
+      {...calendarLocaleProps(locale)}
+      mode="single"
+      selected={date}
+      onSelect={selectDate}
+      // เปิดแล้วเห็นเดือนของค่าที่เลือก (PopoverContent mount ใหม่ทุกครั้งที่เปิด)
+      defaultMonth={date}
+      captionLayout={captionLayout}
+      startMonth={startMonth}
+      endMonth={endMonth}
+      disabled={disabledDates}
+      // focus วันที่เลือก (หรือวันนี้) ทันทีที่เปิด ใช้ลูกศรเลื่อนวัน Enter เลือก Esc ปิด
+      autoFocus
+    />
+  )
+
   const content = (
     <PopoverContent
-      className="bom-popover--flush"
-      align={variant === 'input' ? 'end' : 'start'}
-      // the popover is a dialog named like the field
+      className="w-auto overflow-hidden p-0"
+      align={variant === "input" ? "end" : "start"}
+      // popover เป็น dialog ใช้ชื่อเดียวกับช่อง
       aria-labelledby={labelId}
-      // let the Calendar focus a day instead of Radix focusing the previous-month button
+      // ไม่ให้ Radix focus ปุ่มเดือนก่อนหน้า ปล่อยให้ Calendar focus วันแทน
       onOpenAutoFocus={(e) => e.preventDefault()}
-      // variant="input": return focus to the text box, not the icon button
+      // variant="input": ปิดแล้วกลับไปที่ช่องพิมพ์ ไม่ใช่ปุ่มไอคอน
       onCloseAutoFocus={
-        variant === 'input'
+        variant === "input"
           ? (e) => {
               e.preventDefault()
               inputRef.current?.focus()
@@ -161,33 +212,25 @@ export function RHFDatePicker<TFieldValues extends FieldValues = FieldValues>({
           : undefined
       }
     >
-      <Calendar
-        locale={locale}
-        mode="single"
-        selected={date}
-        onSelect={selectDate}
-        // opens on the selected value's month (PopoverContent remounts on every open)
-        defaultMonth={date}
-        captionLayout={captionLayout}
-        startMonth={startMonth}
-        endMonth={endMonth}
-        disabled={disabledDates}
-        // focus the selected day (or today) right away: arrows move, Enter picks, Esc closes
-        autoFocus
-      />
+      {calendar}
     </PopoverContent>
   )
 
   const labelEl = (
-    <FieldLabel id={labelId} htmlFor={fieldId} className={hideLabel ? 'bom-sr-only' : undefined}>
+    <FieldLabel id={labelId} htmlFor={fieldId} className={hideLabel ? "sr-only" : undefined}>
       {label}
-      {/* variant="input": the text box announces required; the button cannot, so add "(required)" for screen readers */}
-      {required && <RequiredMark announce={variant === 'button'} />}
+      {/* ช่องบังคับ: * ซ่อนจาก screen reader; variant="input" ช่องประกาศ required เอง ส่วนปุ่มประกาศไม่ได้ จึงมีคำว่า "จำเป็น" แบบ sr-only */}
+      {required && (
+        <span aria-hidden="true" className="text-destructive">
+          *
+        </span>
+      )}
+      {required && variant === "button" && <span className="sr-only">({messages.required})</span>}
     </FieldLabel>
   )
 
   const pickerEl =
-    variant === 'input' ? (
+    variant === "input" ? (
       <Popover open={open} onOpenChange={setOpen}>
         <PopoverAnchor asChild>
           <InputGroup data-disabled={isDisabled || undefined} className={triggerClassName}>
@@ -212,8 +255,8 @@ export function RHFDatePicker<TFieldValues extends FieldValues = FieldValues>({
                 fieldOnBlur()
               }}
               onKeyDown={(e) => {
-                // ArrowDown opens the calendar
-                if (e.key === 'ArrowDown') {
+                // ลูกศรลงเปิดปฏิทิน (เหมือนตัวอย่าง shadcn)
+                if (e.key === "ArrowDown") {
                   e.preventDefault()
                   setOpen(true)
                 }
@@ -244,17 +287,21 @@ export function RHFDatePicker<TFieldValues extends FieldValues = FieldValues>({
           <Button
             id={fieldId}
             ref={fieldRef}
-            variant="secondary"
+            type="button"
+            variant="outline"
             data-empty={!date}
             disabled={isDisabled}
             onBlur={fieldOnBlur}
-            // name = label + selected value, e.g. "วันที่ (จำเป็น) 29 ต.ค. 2569"
+            // ชื่อปุ่ม = label + ค่าที่เลือก เช่น "Date (จำเป็น), 29 ต.ค. 2569"
             aria-labelledby={`${labelId} ${valueId}`}
             aria-invalid={invalid}
             aria-describedby={describedBy}
-            className={cn('bom-date-picker__trigger', triggerClassName)}
+            className={cn(
+              "w-full justify-start font-normal data-[empty=true]:text-muted-foreground",
+              triggerClassName
+            )}
           >
-            <CalendarIcon />
+            <CalendarIcon aria-hidden="true" />
             <span id={valueId}>{date ? fmtValue(date) : (placeholder ?? messages.datePickerPlaceholder)}</span>
           </Button>
         </PopoverTrigger>
@@ -276,20 +323,25 @@ export function RHFDatePicker<TFieldValues extends FieldValues = FieldValues>({
       disabled={isDisabled}
       aria-invalid={invalid}
       aria-describedby={describedBy}
-      className="bom-date-picker__time"
+      // ซ่อนไอคอนนาฬิกาของ browser ให้เหมือนตัวอย่าง shadcn (พิมพ์และใช้ลูกศรขึ้นลงได้ตามปกติ)
+      className="appearance-none bg-background [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none"
     />
   )
 
   return (
-    <Field data-invalid={invalid || undefined} data-disabled={isDisabled || undefined} className={className}>
+    <Field
+      data-invalid={invalid || undefined}
+      data-disabled={isDisabled || undefined}
+      className={className}
+    >
       {showTime ? (
-        <div className="bom-field__row">
-          <div className="bom-field__col">
+        <div className="flex gap-3">
+          <div className="flex min-w-0 flex-1 flex-col gap-2">
             {labelEl}
             {pickerEl}
           </div>
-          <div className="bom-field__col bom-field__col--time">
-            <FieldLabel htmlFor={timeId} className={hideLabel ? 'bom-sr-only' : undefined}>
+          <div className="flex w-32 flex-col gap-2">
+            <FieldLabel htmlFor={timeId} className={hideLabel ? "sr-only" : undefined}>
               {timeLabel ?? messages.time}
             </FieldLabel>
             {timeEl}

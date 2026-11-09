@@ -1,16 +1,25 @@
-'use client'
+"use client"
 
-import { forwardRef, type ComponentPropsWithoutRef, type ComponentRef } from 'react'
-import { Label as LabelPrimitive } from 'radix-ui'
-import { cn } from '../../lib/cn'
+import * as React from "react"
+import { cn } from "cn"
+import { Label as LabelPrimitive } from "radix-ui"
 
-export type LabelProps = ComponentPropsWithoutRef<typeof LabelPrimitive.Root>
+function Label({
+  className,
+  ...props
+}: React.ComponentProps<typeof LabelPrimitive.Root>) {
+  return (
+    <LabelPrimitive.Root
+      data-slot="label"
+      className={cn(
+        "flex items-center gap-2 text-sm leading-none font-medium select-none group-data-[disabled=true]:pointer-events-none group-data-[disabled=true]:opacity-50 peer-disabled:cursor-not-allowed peer-disabled:opacity-50",
+        className
+      )}
+      {...props}
+    />
+  )
+}
 
-export const Label = forwardRef<ComponentRef<typeof LabelPrimitive.Root>, LabelProps>(function Label(
-  { className, ...props },
-  ref,
-) {
-  return <LabelPrimitive.Root ref={ref} className={cn('bom-label', className)} {...props} />
-})
+export { Label }
 
-Label.displayName = 'Label'
+export type LabelProps = React.ComponentProps<typeof Label>

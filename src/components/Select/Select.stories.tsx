@@ -62,7 +62,7 @@ export const Popper: Story = {
 export const States: Story = {
   render: () => (
     <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
-      {(['sm', 'md', 'lg'] as const).map((s) => (
+      {(['sm', 'default'] as const).map((s) => (
         <Select key={s}>
           <SelectTrigger aria-label={s} size={s}>
             <SelectValue placeholder={s} />

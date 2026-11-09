@@ -1,58 +1,86 @@
-'use client'
+"use client"
 
-import { forwardRef, type ComponentPropsWithoutRef, type ComponentRef } from 'react'
-import { Accordion as AccordionPrimitive } from 'radix-ui'
-import { cn } from '../../lib/cn'
-import { ChevronDownIcon } from '../../lib/icons'
+import * as React from "react"
+import { cn } from "cn"
+import { ChevronDownIcon, ChevronUpIcon } from "lucide-react"
+import { Accordion as AccordionPrimitive } from "radix-ui"
 
-export type AccordionProps = ComponentPropsWithoutRef<typeof AccordionPrimitive.Root>
 
-export const Accordion = forwardRef<ComponentRef<typeof AccordionPrimitive.Root>, AccordionProps>(function Accordion(
-  { className, ...props },
-  ref,
-) {
-  return <AccordionPrimitive.Root ref={ref} className={cn('bom-accordion', className)} {...props} />
-})
+function Accordion({
+  className,
+  ...props
+}: React.ComponentProps<typeof AccordionPrimitive.Root>) {
+  return (
+    <AccordionPrimitive.Root
+      data-slot="accordion"
+      className={cn("flex w-full flex-col", className)}
+      {...props}
+    />
+  )
+}
 
-Accordion.displayName = 'Accordion'
+function AccordionItem({
+  className,
+  ...props
+}: React.ComponentProps<typeof AccordionPrimitive.Item>) {
+  return (
+    <AccordionPrimitive.Item
+      data-slot="accordion-item"
+      className={cn("not-last:border-b", className)}
+      {...props}
+    />
+  )
+}
 
-export type AccordionItemProps = ComponentPropsWithoutRef<typeof AccordionPrimitive.Item>
+function AccordionTrigger({
+  className,
+  children,
+  ...props
+}: React.ComponentProps<typeof AccordionPrimitive.Trigger>) {
+  return (
+    <AccordionPrimitive.Header className="flex">
+      <AccordionPrimitive.Trigger
+        data-slot="accordion-trigger"
+        className={cn(
+          "group/accordion-trigger relative flex flex-1 items-start justify-between rounded-lg border border-transparent py-2.5 text-left text-sm font-medium transition-all outline-none hover:underline focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 focus-visible:after:border-ring disabled:pointer-events-none disabled:opacity-50 **:data-[slot=accordion-trigger-icon]:ml-auto **:data-[slot=accordion-trigger-icon]:size-4 **:data-[slot=accordion-trigger-icon]:text-muted-foreground",
+          className
+        )}
+        {...props}
+      >
+        {children}
+        <ChevronDownIcon data-slot="accordion-trigger-icon" className="pointer-events-none shrink-0 group-aria-expanded/accordion-trigger:hidden" />
+        <ChevronUpIcon data-slot="accordion-trigger-icon" className="pointer-events-none hidden shrink-0 group-aria-expanded/accordion-trigger:inline" />
+      </AccordionPrimitive.Trigger>
+    </AccordionPrimitive.Header>
+  )
+}
 
-export const AccordionItem = forwardRef<ComponentRef<typeof AccordionPrimitive.Item>, AccordionItemProps>(
-  function AccordionItem({ className, ...props }, ref) {
-    return <AccordionPrimitive.Item ref={ref} className={cn('bom-accordion__item', className)} {...props} />
-  },
-)
+function AccordionContent({
+  className,
+  children,
+  ...props
+}: React.ComponentProps<typeof AccordionPrimitive.Content>) {
+  return (
+    <AccordionPrimitive.Content
+      data-slot="accordion-content"
+      className="overflow-hidden text-sm data-open:animate-accordion-down data-closed:animate-accordion-up"
+      {...props}
+    >
+      <div
+        className={cn(
+          "h-(--radix-accordion-content-height) pt-0 pb-2.5 [&_a]:underline [&_a]:underline-offset-3 [&_a]:hover:text-foreground [&_p:not(:last-child)]:mb-4",
+          className
+        )}
+      >
+        {children}
+      </div>
+    </AccordionPrimitive.Content>
+  )
+}
 
-AccordionItem.displayName = 'AccordionItem'
+export { Accordion, AccordionItem, AccordionTrigger, AccordionContent }
 
-export type AccordionTriggerProps = ComponentPropsWithoutRef<typeof AccordionPrimitive.Trigger>
-
-export const AccordionTrigger = forwardRef<ComponentRef<typeof AccordionPrimitive.Trigger>, AccordionTriggerProps>(
-  function AccordionTrigger({ className, children, ...props }, ref) {
-    return (
-      <AccordionPrimitive.Header className="bom-accordion__header">
-        <AccordionPrimitive.Trigger ref={ref} className={cn('bom-accordion__trigger', className)} {...props}>
-          {children}
-          <ChevronDownIcon className="bom-accordion__icon" />
-        </AccordionPrimitive.Trigger>
-      </AccordionPrimitive.Header>
-    )
-  },
-)
-
-AccordionTrigger.displayName = 'AccordionTrigger'
-
-export type AccordionContentProps = ComponentPropsWithoutRef<typeof AccordionPrimitive.Content>
-
-export const AccordionContent = forwardRef<ComponentRef<typeof AccordionPrimitive.Content>, AccordionContentProps>(
-  function AccordionContent({ className, children, ...props }, ref) {
-    return (
-      <AccordionPrimitive.Content ref={ref} className="bom-accordion__content" {...props}>
-        <div className={cn('bom-accordion__body', className)}>{children}</div>
-      </AccordionPrimitive.Content>
-    )
-  },
-)
-
-AccordionContent.displayName = 'AccordionContent'
+export type AccordionProps = React.ComponentProps<typeof Accordion>
+export type AccordionItemProps = React.ComponentProps<typeof AccordionItem>
+export type AccordionTriggerProps = React.ComponentProps<typeof AccordionTrigger>
+export type AccordionContentProps = React.ComponentProps<typeof AccordionContent>

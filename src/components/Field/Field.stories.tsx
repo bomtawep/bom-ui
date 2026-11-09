@@ -62,7 +62,7 @@ export const Invalid: Story = {
   render: () => (
     <Field data-invalid style={{ maxWidth: 360 }}>
       <FieldLabel htmlFor="i-email">
-        อีเมล<span aria-hidden="true" className="bom-field__required">*</span>
+        อีเมล<span aria-hidden="true" className="text-destructive">*</span>
       </FieldLabel>
       <Input id="i-email" aria-invalid aria-describedby="i-email-e" required />
       <FieldError id="i-email-e" errors={[{ message: 'กรอกอีเมล' }]} />

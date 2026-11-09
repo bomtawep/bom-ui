@@ -1,59 +1,80 @@
-'use client'
+import * as React from "react"
+import { cva, type VariantProps } from "class-variance-authority"
+import { cn } from "cn"
 
-import { forwardRef, type HTMLAttributes } from 'react'
-import { cn } from '../../lib/cn'
+const alertVariants = cva(
+  "group/alert relative grid w-full gap-0.5 rounded-lg border px-2.5 py-2 text-left text-sm has-data-[slot=alert-action]:relative has-data-[slot=alert-action]:pr-18 has-[>svg]:grid-cols-[auto_1fr] has-[>svg]:gap-x-2 *:[svg]:row-span-2 *:[svg]:translate-y-0.5 *:[svg]:text-current *:[svg:not([class*='size-'])]:size-4",
+  {
+    variants: {
+      variant: {
+        default: "bg-card text-card-foreground",
+        destructive:
+          "bg-card text-destructive *:data-[slot=alert-description]:text-destructive/90 *:[svg]:text-current",
+      },
+    },
+    defaultVariants: {
+      variant: "default",
+    },
+  }
+)
 
-export type AlertVariant = 'default' | 'info' | 'success' | 'warning' | 'danger'
-
-export interface AlertProps extends HTMLAttributes<HTMLDivElement> {
-  variant?: AlertVariant
-}
-
-/** Inline message. `danger` is announced immediately (role="alert"); others politely (role="status"). */
-export const Alert = forwardRef<HTMLDivElement, AlertProps>(function Alert(
-  { variant = 'default', className, ...props },
-  ref,
-) {
+function Alert({
+  className,
+  variant,
+  ...props
+}: React.ComponentProps<"div"> & VariantProps<typeof alertVariants>) {
   return (
     <div
-      ref={ref}
-      role={variant === 'danger' ? 'alert' : 'status'}
-      className={cn('bom-alert', `bom-alert--${variant}`, className)}
+      data-slot="alert"
+      role="alert"
+      className={cn(alertVariants({ variant }), className)}
       {...props}
     />
   )
-})
+}
 
-Alert.displayName = 'Alert'
+function AlertTitle({ className, ...props }: React.ComponentProps<"div">) {
+  return (
+    <div
+      data-slot="alert-title"
+      className={cn(
+        "font-medium group-has-[>svg]/alert:col-start-2 [&_a]:underline [&_a]:underline-offset-3 [&_a]:hover:text-foreground",
+        className
+      )}
+      {...props}
+    />
+  )
+}
 
-type DivProps = HTMLAttributes<HTMLDivElement>
+function AlertDescription({
+  className,
+  ...props
+}: React.ComponentProps<"div">) {
+  return (
+    <div
+      data-slot="alert-description"
+      className={cn(
+        "text-sm text-balance text-muted-foreground md:text-pretty [&_a]:underline [&_a]:underline-offset-3 [&_a]:hover:text-foreground [&_p:not(:last-child)]:mb-4",
+        className
+      )}
+      {...props}
+    />
+  )
+}
 
-export type AlertTitleProps = DivProps
+function AlertAction({ className, ...props }: React.ComponentProps<"div">) {
+  return (
+    <div
+      data-slot="alert-action"
+      className={cn("absolute top-2 right-2", className)}
+      {...props}
+    />
+  )
+}
 
-export const AlertTitle = forwardRef<HTMLDivElement, AlertTitleProps>(function AlertTitle({ className, ...props }, ref) {
-  return <div ref={ref} className={cn('bom-alert__title', className)} {...props} />
-})
+export { Alert, AlertTitle, AlertDescription, AlertAction }
 
-AlertTitle.displayName = 'AlertTitle'
-
-export type AlertDescriptionProps = DivProps
-
-export const AlertDescription = forwardRef<HTMLDivElement, AlertDescriptionProps>(function AlertDescription(
-  { className, ...props },
-  ref,
-) {
-  return <div ref={ref} className={cn('bom-alert__description', className)} {...props} />
-})
-
-AlertDescription.displayName = 'AlertDescription'
-
-export type AlertActionProps = DivProps
-
-export const AlertAction = forwardRef<HTMLDivElement, AlertActionProps>(function AlertAction(
-  { className, ...props },
-  ref,
-) {
-  return <div ref={ref} className={cn('bom-alert__action', className)} {...props} />
-})
-
-AlertAction.displayName = 'AlertAction'
+export type AlertProps = React.ComponentProps<typeof Alert>
+export type AlertTitleProps = React.ComponentProps<typeof AlertTitle>
+export type AlertDescriptionProps = React.ComponentProps<typeof AlertDescription>
+export type AlertActionProps = React.ComponentProps<typeof AlertAction>

@@ -57,7 +57,7 @@ describe('RHFDateRangePicker', () => {
     )
     await userEvent.click(screen.getByRole('button', { name: 'submit' }))
     const error = await screen.findByText('เลือกวันเข้าพัก')
-    expect(error).toHaveClass('bom-field__error')
+    expect(error).toHaveAttribute('data-slot', 'field-error')
     expect(screen.getByRole('button', { name: /^ช่วงเข้าพัก/ })).toHaveAttribute('aria-invalid', 'true')
   })
 

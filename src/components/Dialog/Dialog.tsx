@@ -1,144 +1,182 @@
-'use client'
+"use client"
 
-import {
-  forwardRef,
-  type ComponentProps,
-  type ComponentPropsWithoutRef,
-  type ComponentRef,
-  type HTMLAttributes,
-} from 'react'
-import { Dialog as DialogPrimitive } from 'radix-ui'
-import { cn } from '../../lib/cn'
-import { XIcon } from '../../lib/icons'
-import { useBomUI } from '../BomUIProvider/BomUIProvider'
-import { Button } from '../Button/Button'
-import { IconButton } from '../IconButton/IconButton'
+import * as React from "react"
+import { cn } from "cn"
+import { Dialog as DialogPrimitive } from "radix-ui"
 
-export type DialogProps = ComponentProps<typeof DialogPrimitive.Root>
+import { Button } from "../Button/Button"
+import { XIcon } from "lucide-react"
+import { useBomUI } from "../BomUIProvider/BomUIProvider"
 
-export function Dialog(props: DialogProps) {
-  return <DialogPrimitive.Root {...props} />
+function Dialog({
+  ...props
+}: React.ComponentProps<typeof DialogPrimitive.Root>) {
+  return <DialogPrimitive.Root data-slot="dialog" {...props} />
 }
 
-Dialog.displayName = 'Dialog'
-
-export type DialogPortalProps = ComponentProps<typeof DialogPrimitive.Portal>
-
-export function DialogPortal(props: DialogPortalProps) {
-  return <DialogPrimitive.Portal {...props} />
+function DialogTrigger({
+  ...props
+}: React.ComponentProps<typeof DialogPrimitive.Trigger>) {
+  return <DialogPrimitive.Trigger data-slot="dialog-trigger" {...props} />
 }
 
-DialogPortal.displayName = 'DialogPortal'
+function DialogPortal({
+  ...props
+}: React.ComponentProps<typeof DialogPrimitive.Portal>) {
+  return <DialogPrimitive.Portal data-slot="dialog-portal" {...props} />
+}
 
-export type DialogTriggerProps = ComponentPropsWithoutRef<typeof DialogPrimitive.Trigger>
+function DialogClose({
+  ...props
+}: React.ComponentProps<typeof DialogPrimitive.Close>) {
+  return <DialogPrimitive.Close data-slot="dialog-close" {...props} />
+}
 
-export const DialogTrigger = forwardRef<ComponentRef<typeof DialogPrimitive.Trigger>, DialogTriggerProps>(
-  function DialogTrigger(props, ref) {
-    return <DialogPrimitive.Trigger ref={ref} {...props} />
-  },
-)
+function DialogOverlay({
+  className,
+  ...props
+}: React.ComponentProps<typeof DialogPrimitive.Overlay>) {
+  return (
+    <DialogPrimitive.Overlay
+      data-slot="dialog-overlay"
+      className={cn(
+        "fixed inset-0 isolate z-50 bg-black/10 duration-100 supports-backdrop-filter:backdrop-blur-xs data-open:animate-in data-open:fade-in-0 data-closed:animate-out data-closed:fade-out-0",
+        className
+      )}
+      {...props}
+    />
+  )
+}
 
-DialogTrigger.displayName = 'DialogTrigger'
-
-export type DialogCloseProps = ComponentPropsWithoutRef<typeof DialogPrimitive.Close>
-
-export const DialogClose = forwardRef<ComponentRef<typeof DialogPrimitive.Close>, DialogCloseProps>(
-  function DialogClose(props, ref) {
-    return <DialogPrimitive.Close ref={ref} {...props} />
-  },
-)
-
-DialogClose.displayName = 'DialogClose'
-
-export type DialogOverlayProps = ComponentPropsWithoutRef<typeof DialogPrimitive.Overlay>
-
-export const DialogOverlay = forwardRef<ComponentRef<typeof DialogPrimitive.Overlay>, DialogOverlayProps>(
-  function DialogOverlay({ className, ...props }, ref) {
-    return <DialogPrimitive.Overlay ref={ref} className={cn('bom-dialog__overlay', className)} {...props} />
-  },
-)
-
-DialogOverlay.displayName = 'DialogOverlay'
-
-export interface DialogContentProps extends ComponentPropsWithoutRef<typeof DialogPrimitive.Content> {
-  /** Show the X button in the corner. Default true. */
+function DialogContent({
+  className,
+  children,
+  showCloseButton = true,
+  ...props
+}: React.ComponentProps<typeof DialogPrimitive.Content> & {
   showCloseButton?: boolean
-}
-
-export const DialogContent = forwardRef<ComponentRef<typeof DialogPrimitive.Content>, DialogContentProps>(
-  function DialogContent({ className, children, showCloseButton = true, ...props }, ref) {
-    const { messages } = useBomUI()
-    return (
-      <DialogPortal>
-        <DialogOverlay />
-        <DialogPrimitive.Content ref={ref} className={cn('bom-dialog', className)} {...props}>
-          {children}
-          {showCloseButton && (
-            <DialogPrimitive.Close asChild>
-              <IconButton aria-label={messages.close} size="sm" className="bom-dialog__close">
-                <XIcon />
-              </IconButton>
-            </DialogPrimitive.Close>
-          )}
-        </DialogPrimitive.Content>
-      </DialogPortal>
-    )
-  },
-)
-
-DialogContent.displayName = 'DialogContent'
-
-export type DialogHeaderProps = HTMLAttributes<HTMLDivElement>
-
-export const DialogHeader = forwardRef<HTMLDivElement, DialogHeaderProps>(function DialogHeader(
-  { className, ...props },
-  ref,
-) {
-  return <div ref={ref} className={cn('bom-dialog__header', className)} {...props} />
-})
-
-DialogHeader.displayName = 'DialogHeader'
-
-export interface DialogFooterProps extends HTMLAttributes<HTMLDivElement> {
-  /** Add a secondary "Close" button (text from messages.close). Default false. */
-  showCloseButton?: boolean
-}
-
-export const DialogFooter = forwardRef<HTMLDivElement, DialogFooterProps>(function DialogFooter(
-  { className, showCloseButton = false, children, ...props },
-  ref,
-) {
+}) {
   const { messages } = useBomUI()
   return (
-    <div ref={ref} className={cn('bom-dialog__footer', className)} {...props}>
+    <DialogPortal>
+      <DialogOverlay />
+      <DialogPrimitive.Content
+        data-slot="dialog-content"
+        className={cn(
+          "fixed top-1/2 left-1/2 z-50 grid w-full max-w-[calc(100%-2rem)] -translate-x-1/2 -translate-y-1/2 gap-4 rounded-xl bg-popover p-4 text-sm text-popover-foreground ring-1 ring-foreground/10 duration-100 outline-none sm:max-w-sm data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95",
+          className
+        )}
+        {...props}
+      >
+        {children}
+        {showCloseButton && (
+          <DialogPrimitive.Close data-slot="dialog-close" asChild>
+            <Button
+              variant="ghost"
+              className="absolute top-2 right-2"
+              size="icon-sm"
+            >
+              <XIcon
+              />
+              <span className="sr-only">{messages.close}</span>
+            </Button>
+          </DialogPrimitive.Close>
+        )}
+      </DialogPrimitive.Content>
+    </DialogPortal>
+  )
+}
+
+function DialogHeader({ className, ...props }: React.ComponentProps<"div">) {
+  return (
+    <div
+      data-slot="dialog-header"
+      className={cn("flex flex-col gap-2", className)}
+      {...props}
+    />
+  )
+}
+
+function DialogFooter({
+  className,
+  showCloseButton = false,
+  children,
+  ...props
+}: React.ComponentProps<"div"> & {
+  showCloseButton?: boolean
+}) {
+  const { messages } = useBomUI()
+  return (
+    <div
+      data-slot="dialog-footer"
+      className={cn(
+        "-mx-4 -mb-4 flex flex-col-reverse gap-2 rounded-b-xl border-t bg-muted/50 p-4 sm:flex-row sm:justify-end",
+        className
+      )}
+      {...props}
+    >
       {children}
       {showCloseButton && (
         <DialogPrimitive.Close asChild>
-          <Button variant="secondary">{messages.close}</Button>
+          <Button variant="outline">{messages.close}</Button>
         </DialogPrimitive.Close>
       )}
     </div>
   )
-})
+}
 
-DialogFooter.displayName = 'DialogFooter'
+function DialogTitle({
+  className,
+  ...props
+}: React.ComponentProps<typeof DialogPrimitive.Title>) {
+  return (
+    <DialogPrimitive.Title
+      data-slot="dialog-title"
+      className={cn(
+        "font-heading text-base leading-none font-medium",
+        className
+      )}
+      {...props}
+    />
+  )
+}
 
-export type DialogTitleProps = ComponentPropsWithoutRef<typeof DialogPrimitive.Title>
+function DialogDescription({
+  className,
+  ...props
+}: React.ComponentProps<typeof DialogPrimitive.Description>) {
+  return (
+    <DialogPrimitive.Description
+      data-slot="dialog-description"
+      className={cn(
+        "text-sm text-muted-foreground *:[a]:underline *:[a]:underline-offset-3 *:[a]:hover:text-foreground",
+        className
+      )}
+      {...props}
+    />
+  )
+}
 
-export const DialogTitle = forwardRef<ComponentRef<typeof DialogPrimitive.Title>, DialogTitleProps>(
-  function DialogTitle({ className, ...props }, ref) {
-    return <DialogPrimitive.Title ref={ref} className={cn('bom-dialog__title', className)} {...props} />
-  },
-)
+export {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogOverlay,
+  DialogPortal,
+  DialogTitle,
+  DialogTrigger,
+}
 
-DialogTitle.displayName = 'DialogTitle'
-
-export type DialogDescriptionProps = ComponentPropsWithoutRef<typeof DialogPrimitive.Description>
-
-export const DialogDescription = forwardRef<ComponentRef<typeof DialogPrimitive.Description>, DialogDescriptionProps>(
-  function DialogDescription({ className, ...props }, ref) {
-    return <DialogPrimitive.Description ref={ref} className={cn('bom-dialog__description', className)} {...props} />
-  },
-)
-
-DialogDescription.displayName = 'DialogDescription'
+export type DialogProps = React.ComponentProps<typeof Dialog>
+export type DialogCloseProps = React.ComponentProps<typeof DialogClose>
+export type DialogContentProps = React.ComponentProps<typeof DialogContent>
+export type DialogDescriptionProps = React.ComponentProps<typeof DialogDescription>
+export type DialogFooterProps = React.ComponentProps<typeof DialogFooter>
+export type DialogHeaderProps = React.ComponentProps<typeof DialogHeader>
+export type DialogOverlayProps = React.ComponentProps<typeof DialogOverlay>
+export type DialogPortalProps = React.ComponentProps<typeof DialogPortal>
+export type DialogTitleProps = React.ComponentProps<typeof DialogTitle>
+export type DialogTriggerProps = React.ComponentProps<typeof DialogTrigger>

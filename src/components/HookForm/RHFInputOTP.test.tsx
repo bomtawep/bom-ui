@@ -1,3 +1,4 @@
+import '../../test-utils/element-from-point'
 import { screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { REGEXP_ONLY_DIGITS_AND_CHARS } from 'input-otp'
@@ -37,9 +38,9 @@ describe('RHFInputOTP', () => {
 
   it('renders groups with separators', () => {
     const { container } = renderForm<Values>(schema, { code: '' }, <RHFInputOTP name="code" label="Code" groups={[3, 3]} />)
-    expect(container.querySelectorAll('.bom-input-otp__group')).toHaveLength(2)
-    expect(container.querySelectorAll('.bom-input-otp__separator')).toHaveLength(1)
-    expect(container.querySelectorAll('.bom-input-otp__slot')).toHaveLength(6)
+    expect(container.querySelectorAll('[data-slot="input-otp-group"]')).toHaveLength(2)
+    expect(container.querySelectorAll('[data-slot="input-otp-separator"]')).toHaveLength(1)
+    expect(container.querySelectorAll('[data-slot="input-otp-slot"]')).toHaveLength(6)
   })
 
   it('links the error and required', async () => {

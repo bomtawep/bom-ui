@@ -31,7 +31,7 @@ describe('RHFTextArea', () => {
     const box = screen.getByRole('textbox', { name: 'Note' })
     expect(box).toBeRequired()
     expect(box).toBeDisabled()
-    expect(screen.getByText('Note')).toHaveClass('bom-sr-only')
+    expect(screen.getByText('Note')).toHaveClass('sr-only')
   })
 
   it('has no a11y violations', async () => {

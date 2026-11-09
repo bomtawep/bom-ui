@@ -25,26 +25,26 @@ export const Default: Story = {
         <TableRow>
           <TableHead>เลขที่</TableHead>
           <TableHead>สถานะ</TableHead>
-          <TableHead style={{ textAlign: 'right' }}>ยอดเงิน</TableHead>
+          <TableHead className="text-right">ยอดเงิน</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
-        {rows.map(([no, status, amount], i) => (
-          <TableRow key={no} data-state={i === 1 ? 'selected' : undefined}>
-            <TableCell>{no}</TableCell>
+        {rows.map(([no, status, amount]) => (
+          <TableRow key={no}>
+            <TableCell className="font-medium">{no}</TableCell>
             <TableCell>
-              <Badge variant={status === 'ชำระแล้ว' ? 'success' : status === 'รอชำระ' ? 'warning' : 'secondary'}>
+              <Badge variant={status === 'ยกเลิก' ? 'destructive' : status === 'รอชำระ' ? 'outline' : 'secondary'}>
                 {status}
               </Badge>
             </TableCell>
-            <TableCell style={{ textAlign: 'right' }}>{amount}</TableCell>
+            <TableCell className="text-right">{amount}</TableCell>
           </TableRow>
         ))}
       </TableBody>
       <TableFooter>
         <TableRow>
           <TableCell colSpan={2}>รวม</TableCell>
-          <TableCell style={{ textAlign: 'right' }}>4,050.00</TableCell>
+          <TableCell className="text-right">4,050.00</TableCell>
         </TableRow>
       </TableFooter>
     </Table>

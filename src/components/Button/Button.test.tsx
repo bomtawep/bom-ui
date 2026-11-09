@@ -6,80 +6,45 @@ import { expectNoA11yViolations } from '../../test-utils/axe'
 import { Button } from './Button'
 
 describe('Button', () => {
-  it('renders a native button with type="button" by default', () => {
-    render(<Button>Save</Button>)
-    expect(screen.getByRole('button', { name: 'Save' })).toHaveAttribute('type', 'button')
-  })
-
-  it('keeps an explicit type', () => {
-    render(<Button type="submit">Save</Button>)
-    expect(screen.getByRole('button')).toHaveAttribute('type', 'submit')
-  })
-
-  it('defaults to the primary variant and md size', () => {
-    render(<Button>Save</Button>)
-    expect(screen.getByRole('button')).toHaveClass('bom-btn', 'bom-btn--primary', 'bom-btn--md')
-  })
-
-  it.each(['primary', 'secondary', 'ghost', 'danger', 'sparkle'] as const)('applies the %s variant class', (variant) => {
-    render(<Button variant={variant}>Save</Button>)
-    expect(screen.getByRole('button')).toHaveClass(`bom-btn--${variant}`)
-  })
-
-  it.each(['sm', 'md', 'lg'] as const)('applies the %s size class', (size) => {
-    render(<Button size={size}>Save</Button>)
-    expect(screen.getByRole('button')).toHaveClass(`bom-btn--${size}`)
-  })
-
-  it('appends a custom className', () => {
+  it('renders the shadcn default variant and size', () => {
     render(<Button className="extra">Save</Button>)
-    expect(screen.getByRole('button')).toHaveClass('bom-btn', 'extra')
+    const btn = screen.getByRole('button', { name: 'Save' })
+    expect(btn).toHaveAttribute('data-slot', 'button')
+    expect(btn).toHaveAttribute('data-variant', 'default')
+    expect(btn).toHaveAttribute('data-size', 'default')
+    expect(btn).toHaveClass('extra')
   })
 
-  it('forwards the ref to the button element', () => {
-    const ref = createRef<HTMLButtonElement>()
-    render(<Button ref={ref}>Save</Button>)
-    expect(ref.current).toBeInstanceOf(HTMLButtonElement)
-    expect(ref.current).toBe(screen.getByRole('button'))
-  })
+  it.each(['default', 'outline', 'secondary', 'ghost', 'destructive', 'link', 'sparkle'] as const)(
+    'applies the %s variant',
+    (variant) => {
+      render(<Button variant={variant}>x</Button>)
+      expect(screen.getByRole('button')).toHaveAttribute('data-variant', variant)
+    },
+  )
 
-  it('is a forwardRef component (React 18 needs it for refs)', () => {
-    expect((Button as unknown as { $$typeof: symbol }).$$typeof).toBe(Symbol.for('react.forward_ref'))
-  })
-
-  it('calls onClick when clicked', async () => {
-    const onClick = vi.fn()
-    render(<Button onClick={onClick}>Save</Button>)
-    await userEvent.click(screen.getByRole('button'))
-    expect(onClick).toHaveBeenCalledTimes(1)
-  })
-
-  it('does not call onClick when disabled', async () => {
-    const onClick = vi.fn()
+  it.each(['default', 'xs', 'sm', 'lg', 'icon', 'icon-xs', 'icon-sm', 'icon-lg'] as const)('applies the %s size', (size) => {
     render(
-      <Button onClick={onClick} disabled>
-        Save
+      <Button size={size} aria-label="x">
+        x
       </Button>,
     )
-    await userEvent.click(screen.getByRole('button'))
-    expect(onClick).not.toHaveBeenCalled()
+    expect(screen.getByRole('button')).toHaveAttribute('data-size', size)
   })
 
-  it('has a displayName', () => {
-    expect(Button.displayName).toBe('Button')
+  it('merges className with tailwind-merge', () => {
+    render(<Button className="h-12">x</Button>)
+    const cls = screen.getByRole('button').className.split(' ')
+    expect(cls).toContain('h-12')
+    expect(cls).not.toContain('h-8')
   })
 
-  it('has no a11y violations', async () => {
-    const { container } = render(<Button>Save</Button>)
-    await expectNoA11yViolations(container)
+  it('uses the sparkle utility for variant="sparkle"', () => {
+    render(<Button variant="sparkle">Go</Button>)
+    expect(screen.getByRole('button')).toHaveClass('bom-sparkle')
   })
 
-  it('has no a11y violations for the sparkle variant', async () => {
-    const { container } = render(<Button variant="sparkle">Get started</Button>)
-    await expectNoA11yViolations(container)
-  })
-
-  it('shows a busy, disabled state while loading', async () => {
+  it('shows a busy, disabled state with a spinner while loading', async () => {
     const onClick = vi.fn()
     render(
       <Button loading onClick={onClick}>
@@ -89,19 +54,49 @@ describe('Button', () => {
     const btn = screen.getByRole('button', { name: 'Save' })
     expect(btn).toHaveAttribute('aria-busy', 'true')
     expect(btn).toBeDisabled()
-    expect(btn).toHaveClass('bom-btn--loading')
+    expect(btn.querySelector('[data-slot="spinner"]')).toBeInTheDocument()
     await userEvent.click(btn)
     expect(onClick).not.toHaveBeenCalled()
   })
 
-  it('renders its child element with button classes when asChild', () => {
+  it('renders its child with button classes when asChild', () => {
     render(
-      <Button asChild variant="secondary">
+      <Button asChild variant="outline">
         <a href="/x">Go</a>
       </Button>,
     )
     const link = screen.getByRole('link', { name: 'Go' })
-    expect(link).toHaveClass('bom-btn', 'bom-btn--secondary')
-    expect(link).not.toHaveAttribute('type')
+    expect(link).toHaveAttribute('data-slot', 'button')
+    expect(link).toHaveAttribute('data-variant', 'outline')
+  })
+
+  it('calls onClick and respects disabled', async () => {
+    const onClick = vi.fn()
+    const { rerender } = render(<Button onClick={onClick}>Save</Button>)
+    await userEvent.click(screen.getByRole('button'))
+    rerender(
+      <Button onClick={onClick} disabled>
+        Save
+      </Button>,
+    )
+    await userEvent.click(screen.getByRole('button'))
+    expect(onClick).toHaveBeenCalledTimes(1)
+  })
+
+  it('passes the ref to the DOM button', () => {
+    const ref = createRef<HTMLButtonElement>()
+    render(<Button ref={ref}>Save</Button>)
+    expect(ref.current).toBe(screen.getByRole('button'))
+  })
+
+  it('has no a11y violations', async () => {
+    const { container } = render(
+      <>
+        <Button>Save</Button>
+        <Button variant="sparkle">Get started</Button>
+        <Button loading>Saving</Button>
+      </>,
+    )
+    await expectNoA11yViolations(container)
   })
 })

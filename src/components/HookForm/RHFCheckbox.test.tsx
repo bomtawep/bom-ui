@@ -79,7 +79,7 @@ describe('RHFCheckbox (group)', () => {
       defaults,
       <RHFCheckbox name="channels" label="Channels" options={options} orientation="horizontal" />,
     )
-    expect(container.querySelector('.bom-field__options')).toHaveClass('bom-field__options--horizontal')
+    expect(container.querySelector('[data-slot="checkbox-group"]')).toHaveClass('flex-wrap')
   })
 
   it('has no a11y violations (default and card)', async () => {

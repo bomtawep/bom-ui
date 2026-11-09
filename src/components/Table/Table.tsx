@@ -1,93 +1,124 @@
-'use client'
+"use client"
 
-import { forwardRef, type HTMLAttributes, type TableHTMLAttributes, type TdHTMLAttributes, type ThHTMLAttributes } from 'react'
-import { cn } from '../../lib/cn'
+import * as React from "react"
+import { cn } from "cn"
 
-export type TableProps = TableHTMLAttributes<HTMLTableElement>
-
-/** Styled table markup (no sorting/filtering). Wrapped in a horizontally scrolling container. */
-export const Table = forwardRef<HTMLTableElement, TableProps>(function Table({ className, ...props }, ref) {
+function Table({ className, ...props }: React.ComponentProps<"table">) {
   return (
-    <div className="bom-table-container">
-      <table ref={ref} className={cn('bom-table', className)} {...props} />
+    <div
+      data-slot="table-container"
+      className="relative w-full overflow-x-auto"
+    >
+      <table
+        data-slot="table"
+        className={cn("w-full caption-bottom text-sm", className)}
+        {...props}
+      />
     </div>
   )
-})
+}
 
-Table.displayName = 'Table'
+function TableHeader({ className, ...props }: React.ComponentProps<"thead">) {
+  return (
+    <thead
+      data-slot="table-header"
+      className={cn("[&_tr]:border-b", className)}
+      {...props}
+    />
+  )
+}
 
-type SectionProps = HTMLAttributes<HTMLTableSectionElement>
+function TableBody({ className, ...props }: React.ComponentProps<"tbody">) {
+  return (
+    <tbody
+      data-slot="table-body"
+      className={cn("[&_tr:last-child]:border-0", className)}
+      {...props}
+    />
+  )
+}
 
-export type TableHeaderProps = SectionProps
+function TableFooter({ className, ...props }: React.ComponentProps<"tfoot">) {
+  return (
+    <tfoot
+      data-slot="table-footer"
+      className={cn(
+        "border-t bg-muted/50 font-medium [&>tr]:last:border-b-0",
+        className
+      )}
+      {...props}
+    />
+  )
+}
 
-export const TableHeader = forwardRef<HTMLTableSectionElement, TableHeaderProps>(function TableHeader(
-  { className, ...props },
-  ref,
-) {
-  return <thead ref={ref} className={cn('bom-table__header', className)} {...props} />
-})
+function TableRow({ className, ...props }: React.ComponentProps<"tr">) {
+  return (
+    <tr
+      data-slot="table-row"
+      className={cn(
+        "border-b transition-colors hover:bg-muted/50 has-aria-expanded:bg-muted/50 data-[state=selected]:bg-muted",
+        className
+      )}
+      {...props}
+    />
+  )
+}
 
-TableHeader.displayName = 'TableHeader'
+function TableHead({ className, ...props }: React.ComponentProps<"th">) {
+  return (
+    <th
+      data-slot="table-head"
+      className={cn(
+        "h-10 px-2 text-left align-middle font-medium whitespace-nowrap text-foreground [&:has([role=checkbox])]:pr-0",
+        className
+      )}
+      {...props}
+    />
+  )
+}
 
-export type TableBodyProps = SectionProps
+function TableCell({ className, ...props }: React.ComponentProps<"td">) {
+  return (
+    <td
+      data-slot="table-cell"
+      className={cn(
+        "p-2 align-middle whitespace-nowrap [&:has([role=checkbox])]:pr-0",
+        className
+      )}
+      {...props}
+    />
+  )
+}
 
-export const TableBody = forwardRef<HTMLTableSectionElement, TableBodyProps>(function TableBody(
-  { className, ...props },
-  ref,
-) {
-  return <tbody ref={ref} className={cn('bom-table__body', className)} {...props} />
-})
+function TableCaption({
+  className,
+  ...props
+}: React.ComponentProps<"caption">) {
+  return (
+    <caption
+      data-slot="table-caption"
+      className={cn("mt-4 text-sm text-muted-foreground", className)}
+      {...props}
+    />
+  )
+}
 
-TableBody.displayName = 'TableBody'
+export {
+  Table,
+  TableHeader,
+  TableBody,
+  TableFooter,
+  TableHead,
+  TableRow,
+  TableCell,
+  TableCaption,
+}
 
-export type TableFooterProps = SectionProps
-
-export const TableFooter = forwardRef<HTMLTableSectionElement, TableFooterProps>(function TableFooter(
-  { className, ...props },
-  ref,
-) {
-  return <tfoot ref={ref} className={cn('bom-table__footer', className)} {...props} />
-})
-
-TableFooter.displayName = 'TableFooter'
-
-export type TableRowProps = HTMLAttributes<HTMLTableRowElement>
-
-export const TableRow = forwardRef<HTMLTableRowElement, TableRowProps>(function TableRow({ className, ...props }, ref) {
-  return <tr ref={ref} className={cn('bom-table__row', className)} {...props} />
-})
-
-TableRow.displayName = 'TableRow'
-
-export type TableHeadProps = ThHTMLAttributes<HTMLTableCellElement>
-
-export const TableHead = forwardRef<HTMLTableCellElement, TableHeadProps>(function TableHead(
-  { className, ...props },
-  ref,
-) {
-  return <th ref={ref} className={cn('bom-table__head', className)} {...props} />
-})
-
-TableHead.displayName = 'TableHead'
-
-export type TableCellProps = TdHTMLAttributes<HTMLTableCellElement>
-
-export const TableCell = forwardRef<HTMLTableCellElement, TableCellProps>(function TableCell(
-  { className, ...props },
-  ref,
-) {
-  return <td ref={ref} className={cn('bom-table__cell', className)} {...props} />
-})
-
-TableCell.displayName = 'TableCell'
-
-export type TableCaptionProps = HTMLAttributes<HTMLTableCaptionElement>
-
-export const TableCaption = forwardRef<HTMLTableCaptionElement, TableCaptionProps>(function TableCaption(
-  { className, ...props },
-  ref,
-) {
-  return <caption ref={ref} className={cn('bom-table__caption', className)} {...props} />
-})
-
-TableCaption.displayName = 'TableCaption'
+export type TableProps = React.ComponentProps<typeof Table>
+export type TableHeaderProps = React.ComponentProps<typeof TableHeader>
+export type TableBodyProps = React.ComponentProps<typeof TableBody>
+export type TableFooterProps = React.ComponentProps<typeof TableFooter>
+export type TableHeadProps = React.ComponentProps<typeof TableHead>
+export type TableRowProps = React.ComponentProps<typeof TableRow>
+export type TableCellProps = React.ComponentProps<typeof TableCell>
+export type TableCaptionProps = React.ComponentProps<typeof TableCaption>

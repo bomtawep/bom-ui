@@ -1,17 +1,18 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import { Button, type ButtonSize, type ButtonVariant } from './Button'
+import { ArrowRightIcon, PlusIcon } from 'lucide-react'
+import { Button } from './Button'
 
-const variants: ButtonVariant[] = ['primary', 'secondary', 'ghost', 'danger', 'sparkle']
-const sizes: ButtonSize[] = ['sm', 'md', 'lg']
+const variants = ['default', 'outline', 'secondary', 'ghost', 'destructive', 'link', 'sparkle'] as const
+const sizes = ['xs', 'sm', 'default', 'lg'] as const
 
 // Storybook requires a default export for meta; the library itself uses named exports only.
 const meta = {
-  title: 'Components/Button',
+  title: 'Primitives/Button',
   component: Button,
   args: { children: 'Button' },
   argTypes: {
-    variant: { control: 'inline-radio', options: variants },
-    size: { control: 'inline-radio', options: sizes },
+    variant: { control: 'select', options: variants },
+    size: { control: 'select', options: [...sizes, 'icon', 'icon-xs', 'icon-sm', 'icon-lg'] },
   },
 } satisfies Meta<typeof Button>
 
@@ -22,7 +23,7 @@ export const Playground: Story = {}
 
 export const Variants: Story = {
   render: (args) => (
-    <div style={{ display: 'flex', gap: '0.5rem' }}>
+    <div className="flex flex-wrap gap-2">
       {variants.map((variant) => (
         <Button key={variant} {...args} variant={variant}>
           {variant}
@@ -34,7 +35,7 @@ export const Variants: Story = {
 
 export const Sizes: Story = {
   render: (args) => (
-    <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+    <div className="flex items-center gap-2">
       {sizes.map((size) => (
         <Button key={size} {...args} size={size}>
           {size}
@@ -44,25 +45,24 @@ export const Sizes: Story = {
   ),
 }
 
-export const Disabled: Story = {
-  render: (args) => (
-    <div style={{ display: 'flex', gap: '0.5rem' }}>
-      {variants.map((variant) => (
-        <Button key={variant} {...args} variant={variant} disabled>
-          {variant}
-        </Button>
-      ))}
+export const WithIcon: Story = {
+  render: () => (
+    <div className="flex gap-2">
+      <Button>
+        <PlusIcon data-icon="inline-start" /> สร้างใหม่
+      </Button>
+      <Button variant="outline">
+        ถัดไป <ArrowRightIcon data-icon="inline-end" />
+      </Button>
     </div>
   ),
 }
 
-export const Loading: Story = {
-  args: { loading: true, children: 'Saving' },
-}
+export const Loading: Story = { args: { loading: true, children: 'กำลังบันทึก' } }
 
 export const AsChild: Story = {
-  render: (args) => (
-    <Button {...args} asChild variant="secondary">
+  render: () => (
+    <Button asChild variant="outline">
       <a href="#docs">Read the docs</a>
     </Button>
   ),

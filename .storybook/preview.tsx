@@ -2,10 +2,7 @@
 import type { Preview } from '@storybook/react-vite'
 import { enUS, th } from 'react-day-picker/locale'
 import { BomUIProvider, type BomUIMessages } from '../src/components/BomUIProvider'
-import '../src/styles/tokens.css'
-
-// Same files tsup concatenates into dist/styles.css.
-import.meta.glob('../src/components/*/*.css', { eager: true })
+import './tailwind.css'
 
 // English strings for the Locale toolbar (the library default is Thai).
 const englishMessages: BomUIMessages = {
@@ -19,6 +16,8 @@ const englishMessages: BomUIMessages = {
   openCalendar: 'Open calendar',
   time: 'Time',
   pagination: 'Pagination',
+  previous: 'Previous',
+  next: 'Next',
   previousPage: 'Previous page',
   nextPage: 'Next page',
   morePages: 'More pages',
@@ -37,8 +36,8 @@ const englishMessages: BomUIMessages = {
 const preview: Preview = {
   globalTypes: {
     theme: {
-      description: 'Color theme (sets <html data-theme>)',
-      toolbar: { title: 'Theme', icon: 'mirror', items: ['light', 'dark', 'system'], dynamicTitle: true },
+      description: 'Color theme (toggles class="dark" on <html>)',
+      toolbar: { title: 'Theme', icon: 'mirror', items: ['light', 'dark'], dynamicTitle: true },
     },
     locale: {
       description: 'BomUIProvider locale',
@@ -48,18 +47,11 @@ const preview: Preview = {
   initialGlobals: { theme: 'light', locale: 'th' },
   decorators: [
     (Story, context) => {
-      document.documentElement.dataset.theme = context.globals.theme as string
+      document.documentElement.classList.toggle('dark', context.globals.theme === 'dark')
       const en = context.globals.locale === 'en'
       return (
         <BomUIProvider locale={en ? enUS : th} messages={en ? englishMessages : undefined}>
-          <div
-            style={{
-              background: 'var(--bom-color-bg)',
-              color: 'var(--bom-color-fg)',
-              fontFamily: 'var(--bom-font-sans)',
-              padding: '1.5rem',
-            }}
-          >
+          <div className="bg-background p-6 font-sans text-foreground">
             <Story />
           </div>
         </BomUIProvider>
