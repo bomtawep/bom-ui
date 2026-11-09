@@ -1,9 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import { AlertCircleIcon } from '../../lib/icons'
+import { CircleAlertIcon, InfoIcon } from 'lucide-react'
 import { Button } from '../Button'
-import { Alert, AlertAction, AlertDescription, AlertTitle, type AlertVariant } from './Alert'
-
-const variants: AlertVariant[] = ['default', 'info', 'success', 'warning', 'danger']
+import { Alert, AlertAction, AlertDescription, AlertTitle } from './Alert'
 
 // Storybook requires a default export for meta; the library itself uses named exports only.
 const meta = {
@@ -16,20 +14,18 @@ type Story = StoryObj<typeof meta>
 
 export const Variants: Story = {
   render: () => (
-    <div style={{ display: 'grid', gap: '0.75rem', maxWidth: 560 }}>
-      {variants.map((v) => (
-        <Alert key={v} variant={v}>
-          <AlertCircleIcon />
-          <AlertTitle>{v}</AlertTitle>
-          <AlertDescription>รายละเอียดของข้อความแจ้งเตือน</AlertDescription>
-        </Alert>
-      ))}
-      <Alert variant="danger">
-        <AlertCircleIcon />
+    <div className="grid max-w-xl gap-3">
+      <Alert>
+        <InfoIcon />
+        <AlertTitle>อัปเดตระบบ</AlertTitle>
+        <AlertDescription>ระบบจะปิดปรับปรุงคืนนี้ 22:00 น.</AlertDescription>
+      </Alert>
+      <Alert variant="destructive">
+        <CircleAlertIcon />
         <AlertTitle>โหลดข้อมูลไม่สำเร็จ</AlertTitle>
         <AlertDescription>เซิร์ฟเวอร์ไม่ตอบสนอง</AlertDescription>
         <AlertAction>
-          <Button size="sm" variant="secondary">
+          <Button size="sm" variant="outline">
             ลองใหม่
           </Button>
         </AlertAction>

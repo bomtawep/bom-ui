@@ -63,7 +63,7 @@ export const Full: Story = {
               <DropdownMenuItem>ย้าย</DropdownMenuItem>
             </DropdownMenuSubContent>
           </DropdownMenuSub>
-          <DropdownMenuItem variant="danger">ลบ</DropdownMenuItem>
+          <DropdownMenuItem variant="destructive">ลบ</DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
     )

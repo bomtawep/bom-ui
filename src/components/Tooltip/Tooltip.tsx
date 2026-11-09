@@ -1,53 +1,61 @@
-'use client'
+"use client"
 
-import { forwardRef, type ComponentProps, type ComponentPropsWithoutRef, type ComponentRef } from 'react'
-import { Tooltip as TooltipPrimitive } from 'radix-ui'
-import { cn } from '../../lib/cn'
+import * as React from "react"
+import { cn } from "cn"
+import { Tooltip as TooltipPrimitive } from "radix-ui"
 
-export type TooltipProviderProps = ComponentProps<typeof TooltipPrimitive.Provider>
-
-export function TooltipProvider({ delayDuration = 0, ...props }: TooltipProviderProps) {
-  return <TooltipPrimitive.Provider delayDuration={delayDuration} {...props} />
-}
-
-TooltipProvider.displayName = 'TooltipProvider'
-
-export type TooltipProps = ComponentProps<typeof TooltipPrimitive.Root>
-
-/** Wraps itself in a TooltipProvider, so it works without one higher up. */
-export function Tooltip(props: TooltipProps) {
+function TooltipProvider({
+  delayDuration = 0,
+  ...props
+}: React.ComponentProps<typeof TooltipPrimitive.Provider>) {
   return (
-    <TooltipProvider>
-      <TooltipPrimitive.Root {...props} />
-    </TooltipProvider>
+    <TooltipPrimitive.Provider
+      data-slot="tooltip-provider"
+      delayDuration={delayDuration}
+      {...props}
+    />
   )
 }
 
-Tooltip.displayName = 'Tooltip'
+function Tooltip({
+  ...props
+}: React.ComponentProps<typeof TooltipPrimitive.Root>) {
+  return <TooltipPrimitive.Root data-slot="tooltip" {...props} />
+}
 
-export type TooltipTriggerProps = ComponentPropsWithoutRef<typeof TooltipPrimitive.Trigger>
+function TooltipTrigger({
+  ...props
+}: React.ComponentProps<typeof TooltipPrimitive.Trigger>) {
+  return <TooltipPrimitive.Trigger data-slot="tooltip-trigger" {...props} />
+}
 
-export const TooltipTrigger = forwardRef<ComponentRef<typeof TooltipPrimitive.Trigger>, TooltipTriggerProps>(
-  function TooltipTrigger(props, ref) {
-    return <TooltipPrimitive.Trigger ref={ref} {...props} />
-  },
-)
+function TooltipContent({
+  className,
+  sideOffset = 0,
+  children,
+  ...props
+}: React.ComponentProps<typeof TooltipPrimitive.Content>) {
+  return (
+    <TooltipPrimitive.Portal>
+      <TooltipPrimitive.Content
+        data-slot="tooltip-content"
+        sideOffset={sideOffset}
+        className={cn(
+          "z-50 inline-flex w-fit max-w-xs origin-(--radix-tooltip-content-transform-origin) items-center gap-1.5 rounded-md bg-foreground px-3 py-1.5 text-xs text-background has-data-[slot=kbd]:pr-1.5 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 **:data-[slot=kbd]:relative **:data-[slot=kbd]:isolate **:data-[slot=kbd]:z-50 **:data-[slot=kbd]:rounded-sm data-[state=delayed-open]:animate-in data-[state=delayed-open]:fade-in-0 data-[state=delayed-open]:zoom-in-95 data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95",
+          className
+        )}
+        {...props}
+      >
+        {children}
+        <TooltipPrimitive.Arrow className="z-50 size-2.5 translate-y-[calc(-50%_-_2px)] rotate-45 rounded-[2px] bg-foreground fill-foreground" />
+      </TooltipPrimitive.Content>
+    </TooltipPrimitive.Portal>
+  )
+}
 
-TooltipTrigger.displayName = 'TooltipTrigger'
+export { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger }
 
-export type TooltipContentProps = ComponentPropsWithoutRef<typeof TooltipPrimitive.Content>
-
-export const TooltipContent = forwardRef<ComponentRef<typeof TooltipPrimitive.Content>, TooltipContentProps>(
-  function TooltipContent({ className, sideOffset = 4, children, ...props }, ref) {
-    return (
-      <TooltipPrimitive.Portal>
-        <TooltipPrimitive.Content ref={ref} sideOffset={sideOffset} className={cn('bom-tooltip', className)} {...props}>
-          {children}
-          <TooltipPrimitive.Arrow className="bom-tooltip__arrow" width={10} height={5} />
-        </TooltipPrimitive.Content>
-      </TooltipPrimitive.Portal>
-    )
-  },
-)
-
-TooltipContent.displayName = 'TooltipContent'
+export type TooltipProps = React.ComponentProps<typeof Tooltip>
+export type TooltipContentProps = React.ComponentProps<typeof TooltipContent>
+export type TooltipProviderProps = React.ComponentProps<typeof TooltipProvider>
+export type TooltipTriggerProps = React.ComponentProps<typeof TooltipTrigger>

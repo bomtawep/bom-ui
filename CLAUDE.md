@@ -1,6 +1,6 @@
 # bom-ui
 
-React component library สำหรับ Next.js (App Router + Pages Router) ที่ publish ไปยัง **GitHub Packages (npm registry)**
+React component library (โค้ด shadcn/ui + Tailwind CSS v4) สำหรับ Next.js (App Router + Pages Router) ที่ publish ไปยัง **GitHub Packages (npm registry)**
 เพื่อให้หลายโปรเจกต์ติดตั้งแบบ semver ปกติได้:
 
 ```json
@@ -45,8 +45,7 @@ yarn test            # vitest run
 yarn test:watch      # vitest
 yarn storybook       # http://localhost:6006
 yarn build-storybook
-sh scripts/check-css.sh   # component CSS ใช้ --bom-* เท่านั้น
-sh scripts/check-dist.sh  # 'use client' + styles.css หลัง build
+sh scripts/check-dist.sh  # 'use client' + theme.css / source.css หลัง build
 yarn pack --dry-run  # ดูไฟล์ที่จะ publish
 yarn release patch   # bump + commit + git tag (ดู 03-versioning-release)
 git push --follow-tags
@@ -54,7 +53,7 @@ git push --follow-tags
 
 ## Non-negotiables
 
-1. `react`, `react-dom`, `next` เป็น **peerDependencies** เสมอ ห้ามอยู่ใน `dependencies`
+1. `react`, `react-dom`, `next`, `tailwindcss`, `react-hook-form` เป็น **peerDependencies** เสมอ ห้ามอยู่ใน `dependencies`
 2. Component ที่ใช้ hooks / event handlers ต้องรองรับ `'use client'`
 3. ห้าม publish ด้วยมือจากเครื่อง dev — publish ผ่าน CI เมื่อ push tag เท่านั้น
 4. ห้าม commit token ใด ๆ (`.yarnrc.yml` / `.npmrc` อ้าง `${NPM_TOKEN}` เท่านั้น)

@@ -1,18 +1,19 @@
-'use client'
+"use client"
 
-import { forwardRef, useEffect, useRef, useState, type CSSProperties, type HTMLAttributes, type ReactNode } from 'react'
-import { cn } from '../../lib/cn'
-import { ExternalLinkIcon, FileWarningIcon, RefreshIcon } from '../../lib/icons'
-import { useBomUI } from '../BomUIProvider/BomUIProvider'
-import { Button } from '../Button/Button'
-import { Skeleton } from '../Skeleton/Skeleton'
+import * as React from "react"
+import { cn } from "cn"
+import { ExternalLinkIcon, FileWarningIcon, RefreshCwIcon } from "lucide-react"
+
+import { useBomUI } from "../BomUIProvider/BomUIProvider"
+import { Button } from "../Button/Button"
+import { Skeleton } from "../Skeleton/Skeleton"
 
 /**
  * Default loader: fetch → Blob. On an HTTP error it throws with the message from a JSON body
  * (`error.message` or `message`) when there is one, so the preview shows a readable error
  * instead of raw JSON inside the iframe.
  */
-export async function defaultPdfFetcher(url: string): Promise<Blob> {
+async function defaultPdfFetcher(url: string): Promise<Blob> {
   const res = await fetch(url)
   if (!res.ok) {
     const body = (await res.json().catch(() => null)) as { error?: { message?: string }; message?: string } | null
@@ -21,46 +22,43 @@ export async function defaultPdfFetcher(url: string): Promise<Blob> {
   return res.blob()
 }
 
-const defaultErrorMessage = (error: unknown): ReactNode => (error instanceof Error ? error.message : String(error))
+const defaultErrorMessage = (error: unknown): React.ReactNode => (error instanceof Error ? error.message : String(error))
 
-export interface PdfPreviewProps extends Omit<HTMLAttributes<HTMLDivElement>, 'title'> {
+type State = { key: string; blobURL?: string; error?: unknown }
+
+/** bom-ui extra: loads a PDF as a Blob, then shows it in an iframe (errors shown as text, not raw responses). */
+function PdfPreview({
+  url,
+  title,
+  fetcher = defaultPdfFetcher,
+  getErrorMessage = defaultErrorMessage,
+  height = "70vh",
+  actions = true,
+  className,
+  style,
+  ...props
+}: Omit<React.ComponentProps<"div">, "title"> & {
   url: string
   /** iframe title (its accessible name). */
   title: string
   fetcher?: (url: string) => Promise<Blob>
-  getErrorMessage?: (error: unknown) => ReactNode
+  getErrorMessage?: (error: unknown) => React.ReactNode
   /** CSS height of the preview. Default '70vh'. */
   height?: string
   /** Show the regenerate / open-in-new-tab buttons. Default true. */
   actions?: boolean
-}
-
-type State = { key: string; blobURL?: string; error?: unknown }
-
-/** Loads a PDF as a Blob first, then shows it in an iframe (errors are shown as text, not raw responses). */
-export const PdfPreview = forwardRef<HTMLDivElement, PdfPreviewProps>(function PdfPreview(
-  {
-    url,
-    title,
-    fetcher = defaultPdfFetcher,
-    getErrorMessage = defaultErrorMessage,
-    height = '70vh',
-    actions = true,
-    className,
-    style,
-    ...props
-  },
-  ref,
-) {
+}) {
   const { messages } = useBomUI()
-  const [nonce, setNonce] = useState(0)
+  const [nonce, setNonce] = React.useState(0)
   const key = `${url}#${nonce}`
-  const [state, setState] = useState<State>({ key: '' })
+  const [state, setState] = React.useState<State>({ key: "" })
   // keep the latest fetcher without reloading when an inline function changes identity
-  const fetcherRef = useRef(fetcher)
-  fetcherRef.current = fetcher
+  const fetcherRef = React.useRef(fetcher)
+  React.useEffect(() => {
+    fetcherRef.current = fetcher
+  })
 
-  useEffect(() => {
+  React.useEffect(() => {
     let cancelled = false
     let blobURL: string | undefined
     fetcherRef
@@ -82,18 +80,18 @@ export const PdfPreview = forwardRef<HTMLDivElement, PdfPreviewProps>(function P
 
   return (
     <div
-      ref={ref}
-      className={cn('bom-pdf-preview', className)}
-      style={{ '--bom-pdf-height': height, ...style } as CSSProperties}
+      data-slot="pdf-preview"
+      className={cn("flex flex-col gap-2", className)}
+      style={{ ...style, ["--pdf-height" as string]: height }}
       {...props}
     >
       {actions && (
-        <div className="bom-pdf-preview__actions">
-          <Button variant="secondary" size="sm" onClick={() => setNonce((n) => n + 1)} disabled={loading}>
-            <RefreshIcon />
+        <div className="flex justify-end gap-2">
+          <Button variant="outline" size="sm" onClick={() => setNonce((n) => n + 1)} disabled={loading}>
+            <RefreshCwIcon />
             {messages.pdfRegenerate}
           </Button>
-          <Button variant="secondary" size="sm" asChild>
+          <Button variant="outline" size="sm" asChild>
             <a href={url} target="_blank" rel="noreferrer">
               <ExternalLinkIcon />
               {messages.pdfOpenNewTab}
@@ -102,18 +100,23 @@ export const PdfPreview = forwardRef<HTMLDivElement, PdfPreviewProps>(function P
         </div>
       )}
       {loading ? (
-        <Skeleton className="bom-pdf-preview__skeleton" />
+        <Skeleton className="h-(--pdf-height) w-full" />
       ) : state.error !== undefined ? (
-        <div role="alert" className="bom-pdf-preview__error">
-          <FileWarningIcon />
+        <div
+          role="alert"
+          className="flex h-64 flex-col items-center justify-center gap-2 rounded-md border border-dashed text-center text-sm text-muted-foreground"
+        >
+          <FileWarningIcon className="size-8" />
           <p>{messages.pdfFailed}</p>
           <p>{getErrorMessage(state.error)}</p>
         </div>
       ) : (
-        <iframe src={state.blobURL} title={title} className="bom-pdf-preview__frame" />
+        <iframe src={state.blobURL} title={title} className="h-(--pdf-height) w-full rounded-md border" />
       )}
     </div>
   )
-})
+}
 
-PdfPreview.displayName = 'PdfPreview'
+export { defaultPdfFetcher, PdfPreview }
+
+export type PdfPreviewProps = React.ComponentProps<typeof PdfPreview>

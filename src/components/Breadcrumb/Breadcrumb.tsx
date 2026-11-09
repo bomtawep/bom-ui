@@ -1,114 +1,132 @@
-'use client'
+import * as React from "react"
+import { cn } from "cn"
+import { Slot } from "radix-ui"
+import { ChevronRightIcon, MoreHorizontalIcon } from "lucide-react"
+import { useBomUI } from "../BomUIProvider/BomUIProvider"
 
-import {
-  forwardRef,
-  type AnchorHTMLAttributes,
-  type HTMLAttributes,
-  type LiHTMLAttributes,
-  type OlHTMLAttributes,
-} from 'react'
-import { Slot } from 'radix-ui'
-import { cn } from '../../lib/cn'
-import { ChevronRightIcon, MoreHorizontalIcon } from '../../lib/icons'
-import { useBomUI } from '../BomUIProvider/BomUIProvider'
-
-export type BreadcrumbProps = HTMLAttributes<HTMLElement>
-
-export const Breadcrumb = forwardRef<HTMLElement, BreadcrumbProps>(function Breadcrumb(
-  { className, 'aria-label': ariaLabel, ...props },
-  ref,
-) {
+function Breadcrumb({ className, ...props }: React.ComponentProps<"nav">) {
   const { messages } = useBomUI()
-  return <nav ref={ref} aria-label={ariaLabel ?? messages.breadcrumb} className={cn('bom-breadcrumb', className)} {...props} />
-})
-
-Breadcrumb.displayName = 'Breadcrumb'
-
-export type BreadcrumbListProps = OlHTMLAttributes<HTMLOListElement>
-
-export const BreadcrumbList = forwardRef<HTMLOListElement, BreadcrumbListProps>(function BreadcrumbList(
-  { className, ...props },
-  ref,
-) {
-  return <ol ref={ref} className={cn('bom-breadcrumb__list', className)} {...props} />
-})
-
-BreadcrumbList.displayName = 'BreadcrumbList'
-
-export type BreadcrumbItemProps = LiHTMLAttributes<HTMLLIElement>
-
-export const BreadcrumbItem = forwardRef<HTMLLIElement, BreadcrumbItemProps>(function BreadcrumbItem(
-  { className, ...props },
-  ref,
-) {
-  return <li ref={ref} className={cn('bom-breadcrumb__item', className)} {...props} />
-})
-
-BreadcrumbItem.displayName = 'BreadcrumbItem'
-
-export interface BreadcrumbLinkProps extends AnchorHTMLAttributes<HTMLAnchorElement> {
-  /** Render the child (e.g. next/link) with the link classes. */
-  asChild?: boolean
-}
-
-export const BreadcrumbLink = forwardRef<HTMLAnchorElement, BreadcrumbLinkProps>(function BreadcrumbLink(
-  { asChild = false, className, ...props },
-  ref,
-) {
-  const Comp = asChild ? Slot.Root : 'a'
-  return <Comp ref={ref} className={cn('bom-breadcrumb__link', className)} {...props} />
-})
-
-BreadcrumbLink.displayName = 'BreadcrumbLink'
-
-export type BreadcrumbPageProps = HTMLAttributes<HTMLSpanElement>
-
-export const BreadcrumbPage = forwardRef<HTMLSpanElement, BreadcrumbPageProps>(function BreadcrumbPage(
-  { className, ...props },
-  ref,
-) {
   return (
-    <span
-      ref={ref}
-      role="link"
-      aria-disabled="true"
-      aria-current="page"
-      className={cn('bom-breadcrumb__page', className)}
+    <nav
+      aria-label={messages.breadcrumb}
+      data-slot="breadcrumb"
+      className={cn(className)}
       {...props}
     />
   )
-})
+}
 
-BreadcrumbPage.displayName = 'BreadcrumbPage'
-
-export type BreadcrumbSeparatorProps = LiHTMLAttributes<HTMLLIElement>
-
-export const BreadcrumbSeparator = forwardRef<HTMLLIElement, BreadcrumbSeparatorProps>(function BreadcrumbSeparator(
-  { className, children, ...props },
-  ref,
-) {
+function BreadcrumbList({ className, ...props }: React.ComponentProps<"ol">) {
   return (
-    <li ref={ref} role="presentation" aria-hidden="true" className={cn('bom-breadcrumb__separator', className)} {...props}>
-      {children ?? <ChevronRightIcon />}
+    <ol
+      data-slot="breadcrumb-list"
+      className={cn(
+        "flex flex-wrap items-center gap-1.5 text-sm wrap-break-word text-muted-foreground",
+        className
+      )}
+      {...props}
+    />
+  )
+}
+
+function BreadcrumbItem({ className, ...props }: React.ComponentProps<"li">) {
+  return (
+    <li
+      data-slot="breadcrumb-item"
+      className={cn("inline-flex items-center gap-1", className)}
+      {...props}
+    />
+  )
+}
+
+function BreadcrumbLink({
+  asChild,
+  className,
+  ...props
+}: React.ComponentProps<"a"> & {
+  asChild?: boolean
+}) {
+  const Comp = asChild ? Slot.Root : "a"
+
+  return (
+    <Comp
+      data-slot="breadcrumb-link"
+      className={cn("transition-colors hover:text-foreground", className)}
+      {...props}
+    />
+  )
+}
+
+function BreadcrumbPage({ className, ...props }: React.ComponentProps<"span">) {
+  return (
+    <span
+      data-slot="breadcrumb-page"
+      role="link"
+      aria-disabled="true"
+      aria-current="page"
+      className={cn("font-normal text-foreground", className)}
+      {...props}
+    />
+  )
+}
+
+function BreadcrumbSeparator({
+  children,
+  className,
+  ...props
+}: React.ComponentProps<"li">) {
+  return (
+    <li
+      data-slot="breadcrumb-separator"
+      role="presentation"
+      aria-hidden="true"
+      className={cn("[&>svg]:size-3.5", className)}
+      {...props}
+    >
+      {children ?? (
+        <ChevronRightIcon />
+      )}
     </li>
   )
-})
+}
 
-BreadcrumbSeparator.displayName = 'BreadcrumbSeparator'
-
-export type BreadcrumbEllipsisProps = HTMLAttributes<HTMLSpanElement>
-
-export const BreadcrumbEllipsis = forwardRef<HTMLSpanElement, BreadcrumbEllipsisProps>(function BreadcrumbEllipsis(
-  { className, ...props },
-  ref,
-) {
+function BreadcrumbEllipsis({
+  className,
+  ...props
+}: React.ComponentProps<"span">) {
   const { messages } = useBomUI()
   return (
-    <span ref={ref} className={cn('bom-breadcrumb__ellipsis', className)} {...props}>
-      <MoreHorizontalIcon />
-      <span className="bom-sr-only">{messages.breadcrumbMore}</span>
+    <span
+      data-slot="breadcrumb-ellipsis"
+      role="presentation"
+      aria-hidden="true"
+      className={cn(
+        "flex size-5 items-center justify-center [&>svg]:size-4",
+        className
+      )}
+      {...props}
+    >
+      <MoreHorizontalIcon
+      />
+      <span className="sr-only">{messages.breadcrumbMore}</span>
     </span>
   )
-})
+}
 
-BreadcrumbEllipsis.displayName = 'BreadcrumbEllipsis'
+export {
+  Breadcrumb,
+  BreadcrumbList,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+  BreadcrumbEllipsis,
+}
+
+export type BreadcrumbProps = React.ComponentProps<typeof Breadcrumb>
+export type BreadcrumbListProps = React.ComponentProps<typeof BreadcrumbList>
+export type BreadcrumbItemProps = React.ComponentProps<typeof BreadcrumbItem>
+export type BreadcrumbLinkProps = React.ComponentProps<typeof BreadcrumbLink>
+export type BreadcrumbPageProps = React.ComponentProps<typeof BreadcrumbPage>
+export type BreadcrumbSeparatorProps = React.ComponentProps<typeof BreadcrumbSeparator>
+export type BreadcrumbEllipsisProps = React.ComponentProps<typeof BreadcrumbEllipsis>

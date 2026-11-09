@@ -1,148 +1,158 @@
-'use client'
+"use client"
 
-import {
-  forwardRef,
-  type ComponentProps,
-  type ComponentPropsWithoutRef,
-  type ComponentRef,
-  type HTMLAttributes,
-} from 'react'
-import { Dialog as SheetPrimitive } from 'radix-ui'
-import { cn } from '../../lib/cn'
-import { XIcon } from '../../lib/icons'
-import { useBomUI } from '../BomUIProvider/BomUIProvider'
-import { Button } from '../Button/Button'
-import { IconButton } from '../IconButton/IconButton'
+import * as React from "react"
+import { cn } from "cn"
+import { Dialog as SheetPrimitive } from "radix-ui"
 
-export type SheetProps = ComponentProps<typeof SheetPrimitive.Root>
+import { Button } from "../Button/Button"
+import { XIcon } from "lucide-react"
+import { useBomUI } from "../BomUIProvider/BomUIProvider"
 
-export function Sheet(props: SheetProps) {
-  return <SheetPrimitive.Root {...props} />
+function Sheet({ ...props }: React.ComponentProps<typeof SheetPrimitive.Root>) {
+  return <SheetPrimitive.Root data-slot="sheet" {...props} />
 }
 
-Sheet.displayName = 'Sheet'
-
-export type SheetPortalProps = ComponentProps<typeof SheetPrimitive.Portal>
-
-export function SheetPortal(props: SheetPortalProps) {
-  return <SheetPrimitive.Portal {...props} />
+function SheetTrigger({
+  ...props
+}: React.ComponentProps<typeof SheetPrimitive.Trigger>) {
+  return <SheetPrimitive.Trigger data-slot="sheet-trigger" {...props} />
 }
 
-SheetPortal.displayName = 'SheetPortal'
+function SheetClose({
+  ...props
+}: React.ComponentProps<typeof SheetPrimitive.Close>) {
+  return <SheetPrimitive.Close data-slot="sheet-close" {...props} />
+}
 
-export type SheetTriggerProps = ComponentPropsWithoutRef<typeof SheetPrimitive.Trigger>
+function SheetPortal({
+  ...props
+}: React.ComponentProps<typeof SheetPrimitive.Portal>) {
+  return <SheetPrimitive.Portal data-slot="sheet-portal" {...props} />
+}
 
-export const SheetTrigger = forwardRef<ComponentRef<typeof SheetPrimitive.Trigger>, SheetTriggerProps>(
-  function SheetTrigger(props, ref) {
-    return <SheetPrimitive.Trigger ref={ref} {...props} />
-  },
-)
+function SheetOverlay({
+  className,
+  ...props
+}: React.ComponentProps<typeof SheetPrimitive.Overlay>) {
+  return (
+    <SheetPrimitive.Overlay
+      data-slot="sheet-overlay"
+      className={cn(
+        "fixed inset-0 z-50 bg-black/10 duration-100 supports-backdrop-filter:backdrop-blur-xs data-open:animate-in data-open:fade-in-0 data-closed:animate-out data-closed:fade-out-0",
+        className
+      )}
+      {...props}
+    />
+  )
+}
 
-SheetTrigger.displayName = 'SheetTrigger'
-
-export type SheetCloseProps = ComponentPropsWithoutRef<typeof SheetPrimitive.Close>
-
-export const SheetClose = forwardRef<ComponentRef<typeof SheetPrimitive.Close>, SheetCloseProps>(
-  function SheetClose(props, ref) {
-    return <SheetPrimitive.Close ref={ref} {...props} />
-  },
-)
-
-SheetClose.displayName = 'SheetClose'
-
-export type SheetOverlayProps = ComponentPropsWithoutRef<typeof SheetPrimitive.Overlay>
-
-export const SheetOverlay = forwardRef<ComponentRef<typeof SheetPrimitive.Overlay>, SheetOverlayProps>(
-  function SheetOverlay({ className, ...props }, ref) {
-    return <SheetPrimitive.Overlay ref={ref} className={cn('bom-sheet__overlay', className)} {...props} />
-  },
-)
-
-SheetOverlay.displayName = 'SheetOverlay'
-
-export type SheetSide = 'top' | 'right' | 'bottom' | 'left'
-
-export interface SheetContentProps extends ComponentPropsWithoutRef<typeof SheetPrimitive.Content> {
-  /** Edge the panel slides in from. Default 'right'. */
-  side?: SheetSide
-  /** Show the X button in the corner. Default true. */
+function SheetContent({
+  className,
+  children,
+  side = "right",
+  showCloseButton = true,
+  ...props
+}: React.ComponentProps<typeof SheetPrimitive.Content> & {
+  side?: "top" | "right" | "bottom" | "left"
   showCloseButton?: boolean
-}
-
-export const SheetContent = forwardRef<ComponentRef<typeof SheetPrimitive.Content>, SheetContentProps>(
-  function SheetContent({ side = 'right', className, children, showCloseButton = true, ...props }, ref) {
-    const { messages } = useBomUI()
-    return (
-      <SheetPortal>
-        <SheetOverlay />
-        <SheetPrimitive.Content ref={ref} className={cn('bom-sheet', `bom-sheet--${side}`, className)} {...props}>
-          {children}
-          {showCloseButton && (
-            <SheetPrimitive.Close asChild>
-              <IconButton aria-label={messages.close} size="sm" className="bom-sheet__close">
-                <XIcon />
-              </IconButton>
-            </SheetPrimitive.Close>
-          )}
-        </SheetPrimitive.Content>
-      </SheetPortal>
-    )
-  },
-)
-
-SheetContent.displayName = 'SheetContent'
-
-export type SheetHeaderProps = HTMLAttributes<HTMLDivElement>
-
-export const SheetHeader = forwardRef<HTMLDivElement, SheetHeaderProps>(function SheetHeader(
-  { className, ...props },
-  ref,
-) {
-  return <div ref={ref} className={cn('bom-sheet__header', className)} {...props} />
-})
-
-SheetHeader.displayName = 'SheetHeader'
-
-export interface SheetFooterProps extends HTMLAttributes<HTMLDivElement> {
-  /** Add a secondary "Close" button (text from messages.close). Default false. */
-  showCloseButton?: boolean
-}
-
-export const SheetFooter = forwardRef<HTMLDivElement, SheetFooterProps>(function SheetFooter(
-  { className, showCloseButton = false, children, ...props },
-  ref,
-) {
+}) {
   const { messages } = useBomUI()
   return (
-    <div ref={ref} className={cn('bom-sheet__footer', className)} {...props}>
-      {children}
-      {showCloseButton && (
-        <SheetPrimitive.Close asChild>
-          <Button variant="secondary">{messages.close}</Button>
-        </SheetPrimitive.Close>
-      )}
-    </div>
+    <SheetPortal>
+      <SheetOverlay />
+      <SheetPrimitive.Content
+        data-slot="sheet-content"
+        data-side={side}
+        className={cn(
+          "fixed z-50 flex flex-col gap-4 bg-popover bg-clip-padding text-sm text-popover-foreground shadow-lg transition duration-200 ease-in-out data-[side=bottom]:inset-x-0 data-[side=bottom]:bottom-0 data-[side=bottom]:h-auto data-[side=bottom]:border-t data-[side=left]:inset-y-0 data-[side=left]:left-0 data-[side=left]:h-full data-[side=left]:w-3/4 data-[side=left]:border-r data-[side=right]:inset-y-0 data-[side=right]:right-0 data-[side=right]:h-full data-[side=right]:w-3/4 data-[side=right]:border-l data-[side=top]:inset-x-0 data-[side=top]:top-0 data-[side=top]:h-auto data-[side=top]:border-b data-[side=left]:sm:max-w-sm data-[side=right]:sm:max-w-sm data-open:animate-in data-open:fade-in-0 data-[side=bottom]:data-open:slide-in-from-bottom-10 data-[side=left]:data-open:slide-in-from-left-10 data-[side=right]:data-open:slide-in-from-right-10 data-[side=top]:data-open:slide-in-from-top-10 data-closed:animate-out data-closed:fade-out-0 data-[side=bottom]:data-closed:slide-out-to-bottom-10 data-[side=left]:data-closed:slide-out-to-left-10 data-[side=right]:data-closed:slide-out-to-right-10 data-[side=top]:data-closed:slide-out-to-top-10",
+          className
+        )}
+        {...props}
+      >
+        {children}
+        {showCloseButton && (
+          <SheetPrimitive.Close data-slot="sheet-close" asChild>
+            <Button
+              variant="ghost"
+              className="absolute top-3 right-3"
+              size="icon-sm"
+            >
+              <XIcon
+              />
+              <span className="sr-only">{messages.close}</span>
+            </Button>
+          </SheetPrimitive.Close>
+        )}
+      </SheetPrimitive.Content>
+    </SheetPortal>
   )
-})
+}
 
-SheetFooter.displayName = 'SheetFooter'
+function SheetHeader({ className, ...props }: React.ComponentProps<"div">) {
+  return (
+    <div
+      data-slot="sheet-header"
+      className={cn("flex flex-col gap-0.5 p-4", className)}
+      {...props}
+    />
+  )
+}
 
-export type SheetTitleProps = ComponentPropsWithoutRef<typeof SheetPrimitive.Title>
+function SheetFooter({ className, ...props }: React.ComponentProps<"div">) {
+  return (
+    <div
+      data-slot="sheet-footer"
+      className={cn("mt-auto flex flex-col gap-2 p-4", className)}
+      {...props}
+    />
+  )
+}
 
-export const SheetTitle = forwardRef<ComponentRef<typeof SheetPrimitive.Title>, SheetTitleProps>(
-  function SheetTitle({ className, ...props }, ref) {
-    return <SheetPrimitive.Title ref={ref} className={cn('bom-sheet__title', className)} {...props} />
-  },
-)
+function SheetTitle({
+  className,
+  ...props
+}: React.ComponentProps<typeof SheetPrimitive.Title>) {
+  return (
+    <SheetPrimitive.Title
+      data-slot="sheet-title"
+      className={cn(
+        "font-heading text-base font-medium text-foreground",
+        className
+      )}
+      {...props}
+    />
+  )
+}
 
-SheetTitle.displayName = 'SheetTitle'
+function SheetDescription({
+  className,
+  ...props
+}: React.ComponentProps<typeof SheetPrimitive.Description>) {
+  return (
+    <SheetPrimitive.Description
+      data-slot="sheet-description"
+      className={cn("text-sm text-muted-foreground", className)}
+      {...props}
+    />
+  )
+}
 
-export type SheetDescriptionProps = ComponentPropsWithoutRef<typeof SheetPrimitive.Description>
+export {
+  Sheet,
+  SheetTrigger,
+  SheetClose,
+  SheetContent,
+  SheetHeader,
+  SheetFooter,
+  SheetTitle,
+  SheetDescription,
+}
 
-export const SheetDescription = forwardRef<ComponentRef<typeof SheetPrimitive.Description>, SheetDescriptionProps>(
-  function SheetDescription({ className, ...props }, ref) {
-    return <SheetPrimitive.Description ref={ref} className={cn('bom-sheet__description', className)} {...props} />
-  },
-)
-
-SheetDescription.displayName = 'SheetDescription'
+export type SheetProps = React.ComponentProps<typeof Sheet>
+export type SheetTriggerProps = React.ComponentProps<typeof SheetTrigger>
+export type SheetCloseProps = React.ComponentProps<typeof SheetClose>
+export type SheetContentProps = React.ComponentProps<typeof SheetContent>
+export type SheetHeaderProps = React.ComponentProps<typeof SheetHeader>
+export type SheetFooterProps = React.ComponentProps<typeof SheetFooter>
+export type SheetTitleProps = React.ComponentProps<typeof SheetTitle>
+export type SheetDescriptionProps = React.ComponentProps<typeof SheetDescription>

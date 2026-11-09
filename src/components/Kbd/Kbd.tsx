@@ -1,20 +1,30 @@
-'use client'
+import type * as React from "react"
+import { cn } from "cn"
 
-import { forwardRef, type HTMLAttributes } from 'react'
-import { cn } from '../../lib/cn'
+function Kbd({ className, ...props }: React.ComponentProps<"kbd">) {
+  return (
+    <kbd
+      data-slot="kbd"
+      className={cn(
+        "pointer-events-none inline-flex h-5 w-fit min-w-5 items-center justify-center gap-1 rounded-sm bg-muted px-1 font-sans text-xs font-medium text-muted-foreground select-none in-data-[slot=tooltip-content]:bg-background/20 in-data-[slot=tooltip-content]:text-background dark:in-data-[slot=tooltip-content]:bg-background/10 [&_svg:not([class*='size-'])]:size-3",
+        className
+      )}
+      {...props}
+    />
+  )
+}
 
-export type KbdProps = HTMLAttributes<HTMLElement>
+function KbdGroup({ className, ...props }: React.ComponentProps<"div">) {
+  return (
+    <kbd
+      data-slot="kbd-group"
+      className={cn("inline-flex items-center gap-1", className)}
+      {...props}
+    />
+  )
+}
 
-export const Kbd = forwardRef<HTMLElement, KbdProps>(function Kbd({ className, ...props }, ref) {
-  return <kbd ref={ref} className={cn('bom-kbd', className)} {...props} />
-})
+export { Kbd, KbdGroup }
 
-Kbd.displayName = 'Kbd'
-
-export type KbdGroupProps = HTMLAttributes<HTMLElement>
-
-export const KbdGroup = forwardRef<HTMLElement, KbdGroupProps>(function KbdGroup({ className, ...props }, ref) {
-  return <kbd ref={ref} className={cn('bom-kbd-group', className)} {...props} />
-})
-
-KbdGroup.displayName = 'KbdGroup'
+export type KbdProps = React.ComponentProps<typeof Kbd>
+export type KbdGroupProps = React.ComponentProps<typeof KbdGroup>

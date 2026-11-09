@@ -32,7 +32,7 @@ describe('RHFSwitch', () => {
       <RHFSwitch name="notify" label="Notify" description="Email me" variant="card" />,
     )
     const sw = screen.getByRole('switch', { name: 'Notify' })
-    expect(container.querySelector('.bom-field__label > .bom-field')).toBeInTheDocument()
+    expect(container.querySelector('[data-slot="field-label"] > [data-slot="field"]')).toBeInTheDocument()
     await userEvent.click(screen.getByText('Email me'))
     expect(form.methods!.getValues('notify')).toBe(true)
     expect(sw).toHaveAttribute('aria-checked', 'true')
@@ -44,8 +44,9 @@ describe('RHFSwitch', () => {
       { notify: false },
       <RHFSwitch name="notify" label="Notify" labelPosition="end" size="sm" disabled />,
     )
-    const field = container.querySelector('.bom-field')!
-    expect(field.firstElementChild).toHaveClass('bom-switch', 'bom-switch--sm')
+    const field = container.querySelector('[data-slot="field"]')!
+    expect(field.firstElementChild).toHaveAttribute('data-slot', 'switch')
+    expect(field.firstElementChild).toHaveAttribute('data-size', 'sm')
     expect(screen.getByRole('switch')).toBeDisabled()
   })
 

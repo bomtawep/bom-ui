@@ -1,6 +1,5 @@
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { createRef } from 'react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { expectNoA11yViolations } from '../../test-utils/axe'
 import { defaultPdfFetcher, PdfPreview } from './PdfPreview'
@@ -17,7 +16,7 @@ afterEach(() => {
 describe('PdfPreview', () => {
   it('loads the PDF through the fetcher and shows it in an iframe', async () => {
     const fetcher = vi.fn().mockResolvedValue(new Blob(['%PDF']))
-    render(<PdfPreview url="/doc.pdf" title="Invoice" fetcher={fetcher} className="extra" />)
+    render(<PdfPreview url="/doc.pdf" title="Invoice" fetcher={fetcher} />)
     expect(await screen.findByTitle('Invoice')).toHaveAttribute('src', 'blob:pdf')
     expect(fetcher).toHaveBeenCalledWith('/doc.pdf')
     expect(fetcher).toHaveBeenCalledTimes(1)
@@ -66,13 +65,6 @@ describe('PdfPreview', () => {
       vi.fn().mockResolvedValue({ ok: false, statusText: 'Bad Gateway', json: () => Promise.reject(new Error('no json')) }),
     )
     await expect(defaultPdfFetcher('/x.pdf')).rejects.toThrow('Bad Gateway')
-  })
-
-  it('forwards the ref and has a displayName', () => {
-    const ref = createRef<HTMLDivElement>()
-    render(<PdfPreview ref={ref} url="/d.pdf" title="t" fetcher={() => new Promise(() => {})} />)
-    expect(ref.current).toHaveClass('bom-pdf-preview')
-    expect(PdfPreview.displayName).toBe('PdfPreview')
   })
 
   it('has no a11y violations', async () => {

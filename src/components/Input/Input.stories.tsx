@@ -6,7 +6,6 @@ const meta = {
   title: 'Form/Input',
   component: Input,
   args: { placeholder: 'name@example.com', 'aria-label': 'Email' },
-  argTypes: { size: { control: 'inline-radio', options: ['sm', 'md', 'lg'] } },
 } satisfies Meta<typeof Input>
 
 export default meta
@@ -16,10 +15,8 @@ export const Playground: Story = {}
 
 export const States: Story = {
   render: (args) => (
-    <div style={{ display: 'grid', gap: '0.75rem', maxWidth: 320 }}>
-      <Input {...args} size="sm" />
+    <div className="grid max-w-xs gap-3">
       <Input {...args} />
-      <Input {...args} size="lg" />
       <Input {...args} aria-invalid />
       <Input {...args} disabled />
       <Input aria-label="File" type="file" />

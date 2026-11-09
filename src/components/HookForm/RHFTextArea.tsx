@@ -1,23 +1,33 @@
-'use client'
+"use client"
 
-import type { ReactNode } from 'react'
-import { useController, useFormContext, type FieldPath, type FieldValues } from 'react-hook-form'
-import { useFieldIds } from '../../lib/use-field-ids'
-import { Field, FieldDescription, FieldError, FieldLabel } from '../Field/Field'
-import { Textarea, type TextareaProps } from '../Textarea/Textarea'
-import { RequiredMark } from './RequiredMark'
+import * as React from "react"
+import {
+  Controller,
+  useFormContext,
+  type FieldPath,
+  type FieldValues,
+} from "react-hook-form"
+
+import {
+  Field,
+  FieldDescription,
+  FieldError,
+  FieldLabel,
+} from "../Field/Field"
+import { Textarea } from "../Textarea/Textarea"
 
 export type RHFTextAreaProps<TFieldValues extends FieldValues = FieldValues> = Omit<
-  TextareaProps,
-  'name' | 'value' | 'defaultValue' | 'onChange' | 'onBlur' | 'id'
+  React.ComponentProps<typeof Textarea>,
+  "name" | "value" | "defaultValue" | "onChange" | "onBlur" | "ref" | "id"
 > & {
   name: FieldPath<TFieldValues>
-  /** Always required: it names the field for screen readers. Hide it visually with hideLabel. */
-  label: ReactNode
+  // ต้องมีเสมอเพื่อเป็นชื่อของช่องให้ screen reader ถ้าไม่อยากให้เห็นใช้ hideLabel
+  label: React.ReactNode
+  // ซ่อน label ด้วย sr-only (เช่น กล่องข้อความคู่ปุ่มส่ง) screen reader ยังอ่านชื่อได้
   hideLabel?: boolean
-  description?: ReactNode
-  /** 'top' = between label and box, 'bottom' = below the box (default). */
-  descriptionPosition?: 'top' | 'bottom'
+  description?: React.ReactNode
+  // "top" = ระหว่าง label กับกล่อง (ตัวอย่าง Field ในเอกสาร shadcn), "bottom" = ใต้กล่อง (ค่าเริ่มต้น)
+  descriptionPosition?: "top" | "bottom"
   fieldClassName?: string
 }
 
@@ -26,41 +36,69 @@ export function RHFTextArea<TFieldValues extends FieldValues = FieldValues>({
   label,
   hideLabel,
   description,
-  descriptionPosition = 'bottom',
+  descriptionPosition = "bottom",
   disabled,
   required,
   fieldClassName,
   ...textareaProps
 }: RHFTextAreaProps<TFieldValues>) {
   const { control } = useFormContext<TFieldValues>()
-  const { field, fieldState } = useController({ name, control })
-  const invalid = fieldState.invalid
-  const isDisabled = disabled || field.disabled
-  const { fieldId, descriptionId, errorId, describedBy } = useFieldIds('rhf-textarea', name, { description, invalid })
-  const descriptionEl = description && <FieldDescription id={descriptionId}>{description}</FieldDescription>
+  // useId กัน id ชนเมื่อ name เดียวกันอยู่หลายที่ในหน้า (เช่น form ใน dialog + หน้าที่ซ่อนด้วย <Activity>)
+  const uid = React.useId()
+  const fieldId = `rhf-textarea-${name}-${uid}`
 
   return (
-    <Field data-invalid={invalid || undefined} data-disabled={isDisabled || undefined} className={fieldClassName}>
-      <FieldLabel htmlFor={fieldId} className={hideLabel ? 'bom-sr-only' : undefined}>
-        {label}
-        {required && <RequiredMark />}
-      </FieldLabel>
-      {descriptionPosition === 'top' && descriptionEl}
-      <Textarea
-        {...textareaProps}
-        id={fieldId}
-        ref={field.ref}
-        name={field.name}
-        value={field.value ?? ''}
-        onChange={field.onChange}
-        onBlur={field.onBlur}
-        disabled={isDisabled}
-        required={required}
-        aria-invalid={invalid}
-        aria-describedby={describedBy}
-      />
-      {descriptionPosition === 'bottom' && descriptionEl}
-      {invalid && <FieldError id={errorId} errors={[fieldState.error]} />}
-    </Field>
+    <Controller
+      name={name}
+      control={control}
+      render={({ field, fieldState }) => {
+        const invalid = fieldState.invalid
+        const isDisabled = disabled || field.disabled
+        const descriptionId = `${fieldId}-description`
+        const errorId = `${fieldId}-error`
+        // ให้ screen reader อ่านคำอธิบายและข้อความ error ต่อจากชื่อช่อง
+        const describedBy =
+          [description && descriptionId, invalid && errorId]
+            .filter(Boolean)
+            .join(" ") || undefined
+        const descriptionEl = description && (
+          <FieldDescription id={descriptionId}>{description}</FieldDescription>
+        )
+
+        return (
+          <Field
+            data-invalid={invalid || undefined}
+            data-disabled={isDisabled || undefined}
+            className={fieldClassName}
+          >
+            <FieldLabel htmlFor={fieldId} className={hideLabel ? "sr-only" : undefined}>
+              {label}
+              {/* ช่องบังคับ: * ซ่อนจาก screen reader เพราะ textarea required ประกาศ "required" อยู่แล้ว */}
+              {required && (
+                <span aria-hidden="true" className="text-destructive">
+                  *
+                </span>
+              )}
+            </FieldLabel>
+            {descriptionPosition === "top" && descriptionEl}
+            <Textarea
+              {...textareaProps}
+              id={fieldId}
+              ref={field.ref}
+              name={field.name}
+              value={field.value ?? ""}
+              onChange={field.onChange}
+              onBlur={field.onBlur}
+              disabled={isDisabled}
+              required={required}
+              aria-invalid={invalid}
+              aria-describedby={describedBy}
+            />
+            {descriptionPosition === "bottom" && descriptionEl}
+            {invalid && <FieldError id={errorId} errors={[fieldState.error]} />}
+          </Field>
+        )
+      }}
+    />
   )
 }

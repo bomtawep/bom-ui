@@ -11,18 +11,17 @@ bom-ui/
 ├── .storybook/                      # main.ts, preview.tsx (theme toolbar)
 ├── scripts/
 │   ├── release.sh                   # bump + commit + tag
-│   ├── check-css.sh                 # component CSS ห้ามมีสี hardcode
-│   └── check-dist.sh                # 'use client' + styles.css หลัง build
+│   └── check-dist.sh                # 'use client' + theme.css / source.css หลัง build
 ├── src/
 │   ├── components/
 │   │   └── Button/
-│   │       ├── Button.tsx           # 'use client' + forwardRef + displayName
-│   │       ├── Button.css           # bom-btn, bom-btn--<modifier> ใช้ var(--bom-*) เท่านั้น
+│   │       ├── Button.tsx           # โค้ด shadcn (function component + data-slot, class Tailwind)
 │   │       ├── Button.test.tsx      # Vitest + Testing Library + axe
 │   │       ├── Button.stories.tsx   # Storybook (default export meta ได้เฉพาะไฟล์นี้)
 │   │       └── index.ts
-│   ├── lib/cn.ts                    # internal helper (ไม่ export)
-│   ├── styles/tokens.css            # --bom-* tokens light/dark
+│   ├── lib/                         # internal helpers: date.ts, use-field-ids.ts, use-is-mobile.ts, use-transient-state.ts
+│   ├── styles/theme.css             # theme shadcn (:root / .dark) + @theme inline + bom-sparkle
+│   ├── styles/shadcn-tailwind.css   # custom variants ของ shadcn (copy จาก shadcn/dist/tailwind.css)
 │   ├── test-utils/                  # setup.ts, axe.ts
 │   └── index.ts                     # public API — export ทุกอย่างจากที่นี่
 ├── vite.config.ts                   # ใช้ร่วม Vitest + Storybook (ไม่เกี่ยวกับ tsup)
@@ -51,7 +50,7 @@ bom-ui/
 - ทุก component ต้องถูก re-export จาก `src/index.ts` — สิ่งที่ไม่ export ถือเป็น internal
 - ใช้ named export เท่านั้น (ไม่ใช้ `export default`) เพื่อให้ tree-shaking ทำงานและ import ชื่อคงที่
 - Props ต้อง export type ด้วย เช่น `export type { ButtonProps } from './Button'`
-- ทุก component ใช้ `forwardRef` (peer รองรับ React 18) ตั้ง `displayName` รับ `className` + `...props` — Definition of Done ดู spec
+- component ใช้โค้ด shadcn: function component (React 19 ref-as-prop) + `data-slot`, รับ `className` + `...props`; import shadcn ใหม่ด้วย transform path `@/components/ui/x` → `../X/X` และแทนข้อความภาษาอังกฤษด้วย `useBomUI().messages` — Definition of Done ดู spec
 - ห้าม import จาก `next/*` ใน component ทั่วไป ถ้าจำเป็นต้องใช้ (เช่น `next/link`) ให้ `next` เป็น peerDependency และอยู่ใน `external`
 
 ## package.json (baseline)
@@ -75,7 +74,8 @@ bom-ui/
         "default": "./dist/index.cjs"
       }
     },
-    "./styles.css": "./dist/styles.css"
+    "./theme.css": "./dist/theme.css",
+    "./source.css": "./dist/source.css"
   },
   "files": ["dist"],
   "sideEffects": ["**/*.css"],
@@ -95,8 +95,10 @@ bom-ui/
   },
   "packageManager": "yarn@4.18.1",
   "peerDependencies": {
-    "react": ">=18",
-    "react-dom": ">=18"
+    "react": ">=19",
+    "react-dom": ">=19",
+    "react-hook-form": "^7.55.0",
+    "tailwindcss": "^4"
   },
   "devDependencies": {
     "@types/react": "...",
@@ -128,14 +130,14 @@ export default defineConfig({
   dts: true,
   sourcemap: true,
   clean: true,
-  external: ['react', 'react-dom', 'next'],
+  external: ['react', 'react-dom', 'next', 'react-hook-form', 'tailwindcss'],
   banner: { js: "'use client'" },
-  onSuccess: bundleCss,
+  onSuccess: writeCss,
 })
 ```
 
 - `external` ต้องครอบคลุมทุก peerDependency
-- `onSuccess: bundleCss` — รวม `src/styles/tokens.css` + `src/components/<Name>/<Name>.css` (เรียงตามชื่อ) เป็น `dist/styles.css` component ใหม่ไม่ต้องแก้ config แค่ตั้งชื่อไฟล์ CSS ให้ตรงชื่อโฟลเดอร์ — ถ้าโฟลเดอร์ component มีไฟล์ `.css` ที่ชื่อไม่ใช่ `<Name>.css` `bundleCss` จะ throw error (build fail)
+- `onSuccess: writeCss` — เขียน `dist/theme.css` (= `src/styles/theme.css` + `@source "./"`), `dist/source.css` (`@source` อย่างเดียว) และ copy `shadcn-tailwind.css`
 - **ห้ามใส่ `treeshake: true`** — option นี้ทำให้ tsup ส่งต่อให้ Rollup ซึ่งลบ `'use client'` ออกจาก bundle (esbuild tree-shake ESM ให้อยู่แล้ว) ตรวจหลัง build ว่าบรรทัดแรกของ `dist/index.js` เป็น `'use client'`
 - ใช้ tsup 8.x + TypeScript 5.x; dev/CI ใช้ Node 22 (`.nvmrc`)
 - `banner` ใส่ `'use client'` ไว้บนสุดของ bundle (ดู [02-nextjs-compatibility.md](02-nextjs-compatibility.md))

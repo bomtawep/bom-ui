@@ -1,59 +1,68 @@
-'use client'
+"use client"
 
-import { forwardRef, useEffect, useState } from 'react'
-import { Toaster as Sonner, type ToasterProps as SonnerProps } from 'sonner'
-import { cn } from '../../lib/cn'
+import * as React from "react"
+import { Toaster as Sonner, type ToasterProps } from "sonner"
+import { CircleCheckIcon, InfoIcon, TriangleAlertIcon, OctagonXIcon, Loader2Icon } from "lucide-react"
 
-export type ToasterProps = SonnerProps
+type Theme = NonNullable<ToasterProps["theme"]>
 
-type Theme = NonNullable<SonnerProps['theme']>
-
-function readTheme(): Theme {
-  const t = document.documentElement.dataset.theme
-  return t === 'dark' || t === 'system' ? t : 'light'
-}
+const isDark = () => document.documentElement.classList.contains("dark")
 
 /**
  * Renders toasts fired with `toast()`. Place once in the root layout.
- * Follows <html data-theme> (light by default) unless `theme` is passed.
+ * Follows class="dark" on <html> (next-themes attribute="class") unless `theme` is passed.
  */
-export const Toaster = forwardRef<HTMLElement, ToasterProps>(function Toaster(
-  { className, toastOptions, theme: themeProp, ...props },
-  ref,
-) {
-  const [theme, setTheme] = useState<Theme>('light')
+const Toaster = ({ theme: themeProp, ...props }: ToasterProps) => {
+  const [theme, setTheme] = React.useState<Theme>("light")
 
-  useEffect(() => {
+  React.useEffect(() => {
     if (themeProp) return
-    setTheme(readTheme())
-    const observer = new MutationObserver(() => setTheme(readTheme()))
-    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] })
+    const update = () => setTheme(isDark() ? "dark" : "light")
+    update()
+    const observer = new MutationObserver(update)
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] })
     return () => observer.disconnect()
   }, [themeProp])
 
   return (
     <Sonner
-      ref={ref}
       theme={themeProp ?? theme}
-      className={cn('bom-toaster', className)}
-      {...props}
+      className="toaster group"
+      icons={{
+        success: (
+          <CircleCheckIcon className="size-4" />
+        ),
+        info: (
+          <InfoIcon className="size-4" />
+        ),
+        warning: (
+          <TriangleAlertIcon className="size-4" />
+        ),
+        error: (
+          <OctagonXIcon className="size-4" />
+        ),
+        loading: (
+          <Loader2Icon className="size-4 animate-spin" />
+        ),
+      }}
+      style={
+        {
+          "--normal-bg": "var(--popover)",
+          "--normal-text": "var(--popover-foreground)",
+          "--normal-border": "var(--border)",
+          "--border-radius": "var(--radius)",
+        } as React.CSSProperties
+      }
       toastOptions={{
-        ...toastOptions,
         classNames: {
-          toast: 'bom-toast',
-          title: 'bom-toast__title',
-          description: 'bom-toast__description',
-          actionButton: 'bom-toast__action',
-          cancelButton: 'bom-toast__cancel',
-          success: 'bom-toast--success',
-          error: 'bom-toast--danger',
-          warning: 'bom-toast--warning',
-          info: 'bom-toast--info',
-          ...toastOptions?.classNames,
+          toast: "cn-toast",
         },
       }}
+      {...props}
     />
   )
-})
+}
 
-Toaster.displayName = 'Toaster'
+export { Toaster }
+
+export type { ToasterProps }

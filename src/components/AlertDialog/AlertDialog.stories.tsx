@@ -25,7 +25,7 @@ export const ConfirmDelete: Story = {
   render: () => (
     <AlertDialog>
       <AlertDialogTrigger asChild>
-        <Button variant="danger">ลบเอกสาร</Button>
+        <Button variant="destructive">ลบเอกสาร</Button>
       </AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogHeader>
@@ -34,7 +34,7 @@ export const ConfirmDelete: Story = {
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>ยกเลิก</AlertDialogCancel>
-          <AlertDialogAction variant="danger">ลบ</AlertDialogAction>
+          <AlertDialogAction variant="destructive">ลบ</AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>

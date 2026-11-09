@@ -31,9 +31,14 @@ yarn add @bomtawep/ui
 "dependencies": { "@bomtawep/ui": "^2.18.4" }
 ```
 
+```css
+/* app/globals.css — ต้องมี Tailwind CSS v4 */
+@import "tailwindcss";
+@import "@bomtawep/ui/theme.css";
+```
+
 ```tsx
 import { Button } from '@bomtawep/ui'
-import '@bomtawep/ui/styles.css' // ครั้งเดียวใน app/layout.tsx
 ```
 
 อัปเดต: `yarn up @bomtawep/ui` หรือ `yarn upgrade-interactive`
@@ -124,4 +129,4 @@ npm และ Yarn 1 ใช้ `.npmrc` แทน `.yarnrc.yml`:
 | หาเวอร์ชันล่าสุดไม่เจอ ทั้งที่ publish แล้ว | ติด age gate ของ Yarn ≥ 4.18 — ตั้ง `npmMinimalAgeGate: 0` ใต้ scope |
 | `Invalid hook call` | React ซ้ำ 2 ชุด — ตรวจว่า library ใส่ react เป็น peerDependency |
 | Error เรื่อง hooks ใน Server Component | bundle ขาด `'use client'` |
-| class Tailwind ไม่มีผล | ปลายทางไม่ได้ให้ Tailwind scan `node_modules/@bomtawep/ui/dist` |
+| component ไม่มี style / class Tailwind ไม่มีผล | ไม่ได้ `@import "@bomtawep/ui/theme.css"` (หรือ `source.css`) ใน CSS ที่มี `@import "tailwindcss"` |

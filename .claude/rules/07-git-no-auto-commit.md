@@ -22,7 +22,7 @@
 
 ทิ้งการเปลี่ยนแปลงไว้ใน working tree แล้วสรุปให้ผู้ใช้:
 1. รายการไฟล์ที่เปลี่ยน
-2. ผลการตรวจ (`yarn typecheck`, `yarn test`, `yarn build`, `sh scripts/check-dist.sh`, `sh scripts/check-css.sh`)
+2. ผลการตรวจ (`yarn typecheck`, `yarn test`, `yarn build`, `sh scripts/check-dist.sh`)
 3. ข้อความ commit ที่เสนอ (conventional commit)
 
 ## ลำดับความสำคัญ

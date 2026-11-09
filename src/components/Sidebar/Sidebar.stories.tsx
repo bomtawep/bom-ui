@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import { CalendarIcon, ChevronRightIcon, FileWarningIcon, MoreHorizontalIcon, PanelLeftIcon } from '../../lib/icons'
+import { CalendarIcon, FileTextIcon, LayoutDashboardIcon, MoreHorizontalIcon, SettingsIcon } from 'lucide-react'
+import { TooltipProvider } from '../Tooltip'
 import { PageHeader } from '../PageHeader'
 import {
   Sidebar,
@@ -22,8 +23,6 @@ import {
   SidebarProvider,
   SidebarRail,
   SidebarTrigger,
-  type SidebarCollapsible,
-  type SidebarVariant,
 } from './Sidebar'
 
 /**
@@ -40,8 +39,8 @@ const meta = {
   parameters: { layout: 'fullscreen' },
   args: { variant: 'sidebar', collapsible: 'icon' },
   argTypes: {
-    variant: { control: 'inline-radio', options: ['sidebar', 'floating', 'inset'] satisfies SidebarVariant[] },
-    collapsible: { control: 'inline-radio', options: ['offcanvas', 'icon', 'none'] satisfies SidebarCollapsible[] },
+    variant: { control: 'inline-radio', options: ['sidebar', 'floating', 'inset'] as const },
+    collapsible: { control: 'inline-radio', options: ['offcanvas', 'icon', 'none'] as const },
     side: { control: 'inline-radio', options: ['left', 'right'] },
   },
 } satisfies Meta<typeof Sidebar>
@@ -51,20 +50,21 @@ export default meta
 type Story = StoryObj<typeof meta>
 
 const nav = [
-  { label: 'แดชบอร์ด', icon: <PanelLeftIcon />, active: true },
-  { label: 'เอกสาร', icon: <FileWarningIcon />, badge: '12' },
+  { label: 'แดชบอร์ด', icon: <LayoutDashboardIcon />, active: true },
+  { label: 'เอกสาร', icon: <FileTextIcon />, badge: '12' },
   { label: 'ปฏิทิน', icon: <CalendarIcon /> },
 ]
 
 export const AppShell: Story = {
   render: (args) => (
+    <TooltipProvider>
     <SidebarProvider>
       <Sidebar {...args}>
         <SidebarHeader>
           <SidebarMenu>
             <SidebarMenuItem>
               <SidebarMenuButton size="lg">
-                <PanelLeftIcon />
+                <LayoutDashboardIcon />
                 <span>DOF PPS</span>
               </SidebarMenuButton>
             </SidebarMenuItem>
@@ -87,7 +87,7 @@ export const AppShell: Story = {
                 ))}
                 <SidebarMenuItem>
                   <SidebarMenuButton tooltip="ตั้งค่า">
-                    <ChevronRightIcon />
+                    <SettingsIcon />
                     <span>ตั้งค่า</span>
                   </SidebarMenuButton>
                   <SidebarMenuAction aria-label="ตัวเลือก" showOnHover>
@@ -112,15 +112,16 @@ export const AppShell: Story = {
         <SidebarRail />
       </Sidebar>
       <SidebarInset>
-        <header style={{ display: 'flex', alignItems: 'center', gap: 8, padding: 12, borderBottom: '1px solid var(--bom-color-border)' }}>
+        <header className="flex items-center gap-2 border-b p-3">
           <SidebarTrigger />
           <span>แดชบอร์ด</span>
         </header>
-        <div style={{ padding: 24 }}>
+        <div className="p-6">
           <PageHeader title="แดชบอร์ด" description="กด Ctrl/⌘+B เพื่อพับแถบข้าง" />
         </div>
       </SidebarInset>
     </SidebarProvider>
+    </TooltipProvider>
   ),
 }
 

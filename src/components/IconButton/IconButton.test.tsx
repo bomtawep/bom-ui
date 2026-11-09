@@ -1,50 +1,37 @@
 import { render, screen } from '@testing-library/react'
-import { createRef } from 'react'
+import { XIcon } from 'lucide-react'
 import { describe, expect, it } from 'vitest'
-import { XIcon } from '../../lib/icons'
 import { expectNoA11yViolations } from '../../test-utils/axe'
 import { IconButton } from './IconButton'
 
 describe('IconButton', () => {
-  it('uses aria-label as the accessible name', () => {
+  it('is a ghost icon Button named by aria-label', () => {
     render(
-      <IconButton aria-label="Close" className="extra">
+      <IconButton aria-label="Close">
         <XIcon />
       </IconButton>,
     )
-    expect(screen.getByRole('button', { name: 'Close' })).toHaveClass(
-      'bom-btn',
-      'bom-icon-btn',
-      'bom-icon-btn--md',
-      'bom-btn--ghost',
-      'extra',
-    )
+    const btn = screen.getByRole('button', { name: 'Close' })
+    expect(btn).toHaveAttribute('data-slot', 'button')
+    expect(btn).toHaveAttribute('data-variant', 'ghost')
+    expect(btn).toHaveAttribute('data-size', 'icon')
   })
 
-  it.each(['sm', 'md', 'lg'] as const)('applies the %s size class', (size) => {
-    render(<IconButton aria-label="x" size={size} />)
-    expect(screen.getByRole('button')).toHaveClass(`bom-icon-btn--${size}`)
-  })
-
-  it.each(['primary', 'secondary', 'ghost', 'danger'] as const)('applies the %s variant', (variant) => {
-    render(<IconButton aria-label="x" variant={variant} />)
-    expect(screen.getByRole('button')).toHaveClass(`bom-btn--${variant}`)
+  it.each([
+    ['xs', 'icon-xs'],
+    ['sm', 'icon-sm'],
+    ['default', 'icon'],
+    ['lg', 'icon-lg'],
+  ] as const)('maps size %s to %s', (size, expected) => {
+    render(<IconButton aria-label="x" size={size} variant="outline" />)
+    expect(screen.getByRole('button')).toHaveAttribute('data-size', expected)
+    expect(screen.getByRole('button')).toHaveAttribute('data-variant', 'outline')
   })
 
   it('requires aria-label in its type', () => {
     // @ts-expect-error aria-label is required
     const missing = <IconButton>x</IconButton>
     expect(missing).toBeTruthy()
-  })
-
-  it('forwards the ref', () => {
-    const ref = createRef<HTMLButtonElement>()
-    render(<IconButton aria-label="x" ref={ref} />)
-    expect(ref.current).toBeInstanceOf(HTMLButtonElement)
-  })
-
-  it('has a displayName', () => {
-    expect(IconButton.displayName).toBe('IconButton')
   })
 
   it('has no a11y violations', async () => {
