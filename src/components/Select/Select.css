@@ -1,0 +1,184 @@
+.bom-select__trigger {
+  display: inline-flex;
+  width: fit-content;
+  height: var(--bom-control-height-md);
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--bom-space-2);
+  padding: 0 var(--bom-space-3);
+  border: 1px solid var(--bom-color-input);
+  border-radius: var(--bom-radius-md);
+  background: var(--bom-color-bg);
+  color: var(--bom-color-fg);
+  font-family: inherit;
+  font-size: var(--bom-font-size-sm);
+  line-height: 1.25;
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    border-color var(--bom-duration-fast),
+    box-shadow var(--bom-duration-fast);
+}
+
+.bom-select__trigger--full {
+  width: 100%;
+}
+
+.bom-select__trigger--sm {
+  height: var(--bom-control-height-sm);
+  padding: 0 var(--bom-space-2);
+  font-size: var(--bom-font-size-xs);
+}
+
+.bom-select__trigger--lg {
+  height: var(--bom-control-height-lg);
+  font-size: var(--bom-font-size-md);
+}
+
+.bom-select__trigger:focus-visible {
+  outline: none;
+  border-color: var(--bom-color-ring);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--bom-color-ring) 30%, transparent);
+}
+
+.bom-select__trigger[aria-invalid='true'] {
+  border-color: var(--bom-color-danger);
+}
+
+.bom-select__trigger[data-placeholder] {
+  color: var(--bom-color-muted-fg);
+}
+
+.bom-select__trigger:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.bom-select__value {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: var(--bom-space-2);
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.bom-select__icon {
+  width: 1rem;
+  height: 1rem;
+  flex-shrink: 0;
+  color: var(--bom-color-muted-fg);
+}
+
+.bom-select__content {
+  position: relative;
+  z-index: var(--bom-z-popover);
+  min-width: 9rem;
+  max-height: var(--radix-select-content-available-height);
+  overflow: hidden;
+  border: 1px solid var(--bom-color-border);
+  border-radius: var(--bom-radius-lg);
+  background: var(--bom-color-surface);
+  color: var(--bom-color-surface-fg);
+  box-shadow: var(--bom-shadow-md);
+  transform-origin: var(--radix-select-content-transform-origin);
+}
+
+.bom-select__content--popper[data-side='bottom'] {
+  translate: 0 0.25rem;
+}
+
+.bom-select__content--popper[data-side='top'] {
+  translate: 0 -0.25rem;
+}
+
+.bom-select__content--popper[data-state='open'] {
+  animation: bom-select-in var(--bom-duration-fast) ease-out;
+}
+
+.bom-select__viewport {
+  padding: var(--bom-space-1);
+}
+
+.bom-select__content--popper .bom-select__viewport {
+  width: 100%;
+  min-width: var(--radix-select-trigger-width);
+}
+
+.bom-select__item {
+  position: relative;
+  display: flex;
+  width: 100%;
+  align-items: center;
+  gap: var(--bom-space-2);
+  padding: var(--bom-space-2) var(--bom-space-2) var(--bom-space-2) var(--bom-space-8);
+  border-radius: var(--bom-radius-sm);
+  font-size: var(--bom-font-size-sm);
+  outline: none;
+  cursor: default;
+  user-select: none;
+}
+
+.bom-select__item[data-highlighted] {
+  background: var(--bom-color-accent);
+  color: var(--bom-color-accent-fg);
+}
+
+.bom-select__item[data-disabled] {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.bom-select__item-indicator {
+  position: absolute;
+  left: var(--bom-space-2);
+  display: flex;
+  width: 1rem;
+  height: 1rem;
+  align-items: center;
+  justify-content: center;
+}
+
+.bom-select__item-indicator svg {
+  width: 1rem;
+  height: 1rem;
+}
+
+.bom-select__label {
+  padding: var(--bom-space-2) var(--bom-space-2) var(--bom-space-1);
+  color: var(--bom-color-muted-fg);
+  font-size: var(--bom-font-size-xs);
+  font-weight: var(--bom-font-weight-medium);
+}
+
+.bom-select__separator {
+  height: 1px;
+  margin: var(--bom-space-1) calc(var(--bom-space-1) * -1);
+  background: var(--bom-color-border);
+}
+
+.bom-select__scroll {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--bom-space-1) 0;
+  cursor: default;
+}
+
+.bom-select__scroll svg {
+  width: 1rem;
+  height: 1rem;
+}
+
+@keyframes bom-select-in {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bom-select__content--popper[data-state='open'] {
+    animation: none;
+  }
+}

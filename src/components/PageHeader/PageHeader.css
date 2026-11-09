@@ -1,0 +1,34 @@
+.bom-page-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--bom-space-4);
+}
+
+.bom-page-header__text {
+  display: flex;
+  flex-direction: column;
+  gap: var(--bom-space-1);
+}
+
+.bom-page-header__title {
+  margin: 0;
+  color: var(--bom-color-fg);
+  font-size: var(--bom-font-size-2xl);
+  font-weight: var(--bom-font-weight-semibold);
+  line-height: 1.25;
+  letter-spacing: -0.01em;
+}
+
+.bom-page-header__description {
+  margin: 0;
+  color: var(--bom-color-muted-fg);
+  font-size: var(--bom-font-size-sm);
+}
+
+.bom-page-header__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--bom-space-2);
+}

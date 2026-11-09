@@ -1,0 +1,48 @@
+.bom-pdf-preview {
+  display: flex;
+  flex-direction: column;
+  gap: var(--bom-space-2);
+}
+
+.bom-pdf-preview__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--bom-space-2);
+}
+
+.bom-pdf-preview__skeleton,
+.bom-pdf-preview__frame {
+  width: 100%;
+  height: var(--bom-pdf-height, 70vh);
+}
+
+.bom-pdf-preview__frame {
+  border: 1px solid var(--bom-color-border);
+  border-radius: var(--bom-radius-md);
+  background: var(--bom-color-surface);
+  box-sizing: border-box;
+}
+
+.bom-pdf-preview__error {
+  display: flex;
+  min-height: 16rem;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--bom-space-2);
+  padding: var(--bom-space-4);
+  border: 1px dashed var(--bom-color-border);
+  border-radius: var(--bom-radius-md);
+  color: var(--bom-color-muted-fg);
+  font-size: var(--bom-font-size-sm);
+  text-align: center;
+}
+
+.bom-pdf-preview__error > svg {
+  width: 2rem;
+  height: 2rem;
+}
+
+.bom-pdf-preview__error > p {
+  margin: 0;
+}

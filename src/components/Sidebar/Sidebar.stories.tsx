@@ -1,0 +1,129 @@
+import type { Meta, StoryObj } from '@storybook/react-vite'
+import { CalendarIcon, ChevronRightIcon, FileWarningIcon, MoreHorizontalIcon, PanelLeftIcon } from '../../lib/icons'
+import { PageHeader } from '../PageHeader'
+import {
+  Sidebar,
+  SidebarContent,
+  SidebarFooter,
+  SidebarGroup,
+  SidebarGroupContent,
+  SidebarGroupLabel,
+  SidebarHeader,
+  SidebarInput,
+  SidebarInset,
+  SidebarMenu,
+  SidebarMenuAction,
+  SidebarMenuBadge,
+  SidebarMenuButton,
+  SidebarMenuItem,
+  SidebarMenuSub,
+  SidebarMenuSubButton,
+  SidebarMenuSubItem,
+  SidebarProvider,
+  SidebarRail,
+  SidebarTrigger,
+  type SidebarCollapsible,
+  type SidebarVariant,
+} from './Sidebar'
+
+/**
+ * Remember the open state across reloads: read the cookie in a Server Component and pass it on.
+ *
+ * ```tsx
+ * const open = (await cookies()).get('sidebar_state')?.value !== 'false'
+ * return <SidebarProvider defaultOpen={open}>…</SidebarProvider>
+ * ```
+ */
+const meta = {
+  title: 'App/Sidebar',
+  component: Sidebar,
+  parameters: { layout: 'fullscreen' },
+  args: { variant: 'sidebar', collapsible: 'icon' },
+  argTypes: {
+    variant: { control: 'inline-radio', options: ['sidebar', 'floating', 'inset'] satisfies SidebarVariant[] },
+    collapsible: { control: 'inline-radio', options: ['offcanvas', 'icon', 'none'] satisfies SidebarCollapsible[] },
+    side: { control: 'inline-radio', options: ['left', 'right'] },
+  },
+} satisfies Meta<typeof Sidebar>
+
+// Storybook requires a default export for meta; the library itself uses named exports only.
+export default meta
+type Story = StoryObj<typeof meta>
+
+const nav = [
+  { label: 'แดชบอร์ด', icon: <PanelLeftIcon />, active: true },
+  { label: 'เอกสาร', icon: <FileWarningIcon />, badge: '12' },
+  { label: 'ปฏิทิน', icon: <CalendarIcon /> },
+]
+
+export const AppShell: Story = {
+  render: (args) => (
+    <SidebarProvider>
+      <Sidebar {...args}>
+        <SidebarHeader>
+          <SidebarMenu>
+            <SidebarMenuItem>
+              <SidebarMenuButton size="lg">
+                <PanelLeftIcon />
+                <span>DOF PPS</span>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          </SidebarMenu>
+          <SidebarInput aria-label="ค้นหาเมนู" placeholder="ค้นหา" />
+        </SidebarHeader>
+        <SidebarContent>
+          <SidebarGroup>
+            <SidebarGroupLabel>เมนูหลัก</SidebarGroupLabel>
+            <SidebarGroupContent>
+              <SidebarMenu>
+                {nav.map((n) => (
+                  <SidebarMenuItem key={n.label}>
+                    <SidebarMenuButton isActive={n.active} tooltip={n.label}>
+                      {n.icon}
+                      <span>{n.label}</span>
+                    </SidebarMenuButton>
+                    {n.badge && <SidebarMenuBadge>{n.badge}</SidebarMenuBadge>}
+                  </SidebarMenuItem>
+                ))}
+                <SidebarMenuItem>
+                  <SidebarMenuButton tooltip="ตั้งค่า">
+                    <ChevronRightIcon />
+                    <span>ตั้งค่า</span>
+                  </SidebarMenuButton>
+                  <SidebarMenuAction aria-label="ตัวเลือก" showOnHover>
+                    <MoreHorizontalIcon />
+                  </SidebarMenuAction>
+                  <SidebarMenuSub>
+                    <SidebarMenuSubItem>
+                      <SidebarMenuSubButton href="#users" isActive>
+                        ผู้ใช้
+                      </SidebarMenuSubButton>
+                    </SidebarMenuSubItem>
+                    <SidebarMenuSubItem>
+                      <SidebarMenuSubButton href="#roles">สิทธิ์</SidebarMenuSubButton>
+                    </SidebarMenuSubItem>
+                  </SidebarMenuSub>
+                </SidebarMenuItem>
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
+        </SidebarContent>
+        <SidebarFooter>v0.2.0</SidebarFooter>
+        <SidebarRail />
+      </Sidebar>
+      <SidebarInset>
+        <header style={{ display: 'flex', alignItems: 'center', gap: 8, padding: 12, borderBottom: '1px solid var(--bom-color-border)' }}>
+          <SidebarTrigger />
+          <span>แดชบอร์ด</span>
+        </header>
+        <div style={{ padding: 24 }}>
+          <PageHeader title="แดชบอร์ด" description="กด Ctrl/⌘+B เพื่อพับแถบข้าง" />
+        </div>
+      </SidebarInset>
+    </SidebarProvider>
+  ),
+}
+
+export const Floating: Story = { ...AppShell, args: { variant: 'floating' } }
+export const Inset: Story = { ...AppShell, args: { variant: 'inset' } }
+export const Offcanvas: Story = { ...AppShell, args: { collapsible: 'offcanvas' } }

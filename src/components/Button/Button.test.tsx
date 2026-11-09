@@ -78,4 +78,30 @@ describe('Button', () => {
     const { container } = render(<Button variant="sparkle">Get started</Button>)
     await expectNoA11yViolations(container)
   })
+
+  it('shows a busy, disabled state while loading', async () => {
+    const onClick = vi.fn()
+    render(
+      <Button loading onClick={onClick}>
+        Save
+      </Button>,
+    )
+    const btn = screen.getByRole('button', { name: 'Save' })
+    expect(btn).toHaveAttribute('aria-busy', 'true')
+    expect(btn).toBeDisabled()
+    expect(btn).toHaveClass('bom-btn--loading')
+    await userEvent.click(btn)
+    expect(onClick).not.toHaveBeenCalled()
+  })
+
+  it('renders its child element with button classes when asChild', () => {
+    render(
+      <Button asChild variant="secondary">
+        <a href="/x">Go</a>
+      </Button>,
+    )
+    const link = screen.getByRole('link', { name: 'Go' })
+    expect(link).toHaveClass('bom-btn', 'bom-btn--secondary')
+    expect(link).not.toHaveAttribute('type')
+  })
 })

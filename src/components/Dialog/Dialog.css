@@ -1,0 +1,116 @@
+.bom-dialog__overlay {
+  position: fixed;
+  inset: 0;
+  z-index: var(--bom-z-overlay);
+  background: var(--bom-color-overlay);
+}
+
+.bom-dialog__overlay[data-state='open'] {
+  animation: bom-dialog-fade-in var(--bom-duration-normal) ease-out;
+}
+
+.bom-dialog__overlay[data-state='closed'] {
+  animation: bom-dialog-fade-out var(--bom-duration-normal) ease-in;
+}
+
+.bom-dialog {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  z-index: var(--bom-z-overlay);
+  display: grid;
+  width: calc(100% - 2rem);
+  max-width: 32rem;
+  max-height: calc(100dvh - 2rem);
+  gap: var(--bom-space-4);
+  padding: var(--bom-space-6);
+  overflow-y: auto;
+  border: 1px solid var(--bom-color-border);
+  border-radius: var(--bom-radius-xl);
+  background: var(--bom-color-surface);
+  color: var(--bom-color-surface-fg);
+  font-size: var(--bom-font-size-sm);
+  box-shadow: var(--bom-shadow-lg);
+  transform: translate(-50%, -50%);
+  outline: none;
+  box-sizing: border-box;
+}
+
+.bom-dialog[data-state='open'] {
+  animation: bom-dialog-zoom-in var(--bom-duration-normal) ease-out;
+}
+
+.bom-dialog[data-state='closed'] {
+  animation: bom-dialog-zoom-out var(--bom-duration-normal) ease-in;
+}
+
+.bom-dialog__close {
+  position: absolute;
+  top: var(--bom-space-3);
+  right: var(--bom-space-3);
+}
+
+.bom-dialog__header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--bom-space-2);
+  padding-right: var(--bom-space-6);
+}
+
+.bom-dialog__footer {
+  display: flex;
+  flex-direction: column-reverse;
+  gap: var(--bom-space-2);
+}
+
+@media (min-width: 640px) {
+  .bom-dialog__footer {
+    flex-direction: row;
+    justify-content: flex-end;
+  }
+}
+
+.bom-dialog__title {
+  margin: 0;
+  font-size: var(--bom-font-size-lg);
+  font-weight: var(--bom-font-weight-semibold);
+  line-height: 1.3;
+}
+
+.bom-dialog__description {
+  margin: 0;
+  color: var(--bom-color-muted-fg);
+}
+
+@keyframes bom-dialog-fade-in {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes bom-dialog-fade-out {
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes bom-dialog-zoom-in {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.95);
+  }
+}
+
+@keyframes bom-dialog-zoom-out {
+  to {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.95);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bom-dialog[data-state],
+  .bom-dialog__overlay[data-state] {
+    animation: none;
+  }
+}

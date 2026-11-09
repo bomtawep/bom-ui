@@ -1,0 +1,18 @@
+.bom-skeleton {
+  min-height: 1rem;
+  border-radius: var(--bom-radius-md);
+  background: var(--bom-color-muted);
+  animation: bom-skeleton-pulse 2s ease-in-out infinite;
+}
+
+@keyframes bom-skeleton-pulse {
+  50% {
+    opacity: 0.5;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bom-skeleton {
+    animation: none;
+  }
+}

@@ -1,0 +1,48 @@
+/* sonner reads these variables; map them to --bom-* tokens */
+.bom-toaster {
+  --normal-bg: var(--bom-color-surface);
+  --normal-text: var(--bom-color-surface-fg);
+  --normal-border: var(--bom-color-border);
+  --border-radius: var(--bom-radius-lg);
+  font-family: var(--bom-font-sans);
+  z-index: var(--bom-z-toast);
+}
+
+.bom-toast {
+  font-size: var(--bom-font-size-sm);
+  box-shadow: var(--bom-shadow-md);
+}
+
+.bom-toast__title {
+  font-weight: var(--bom-font-weight-medium);
+}
+
+.bom-toast__description {
+  color: var(--bom-color-muted-fg);
+}
+
+.bom-toast--success [data-icon] {
+  color: var(--bom-color-success);
+}
+
+.bom-toast--danger [data-icon] {
+  color: var(--bom-color-danger);
+}
+
+.bom-toast--warning [data-icon] {
+  color: var(--bom-color-warning);
+}
+
+.bom-toast--info [data-icon] {
+  color: var(--bom-color-info);
+}
+
+.bom-toaster .bom-toast__action {
+  background: var(--bom-color-primary);
+  color: var(--bom-color-primary-fg);
+}
+
+.bom-toaster .bom-toast__cancel {
+  background: var(--bom-color-muted);
+  color: var(--bom-color-fg);
+}

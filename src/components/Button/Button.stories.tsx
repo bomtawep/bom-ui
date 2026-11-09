@@ -55,3 +55,15 @@ export const Disabled: Story = {
     </div>
   ),
 }
+
+export const Loading: Story = {
+  args: { loading: true, children: 'Saving' },
+}
+
+export const AsChild: Story = {
+  render: (args) => (
+    <Button {...args} asChild variant="secondary">
+      <a href="#docs">Read the docs</a>
+    </Button>
+  ),
+}

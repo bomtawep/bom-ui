@@ -1,0 +1,4 @@
+/* Built on Alert (variant="danger"); this hook exists for consumer overrides. */
+.bom-error-state {
+  min-height: var(--bom-control-height-lg);
+}

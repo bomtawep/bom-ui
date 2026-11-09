@@ -1,0 +1,57 @@
+.bom-checkbox {
+  position: relative;
+  display: inline-flex;
+  flex-shrink: 0;
+  width: 1rem;
+  height: 1rem;
+  padding: 0;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--bom-color-input);
+  border-radius: var(--bom-radius-sm);
+  background: var(--bom-color-bg);
+  color: var(--bom-color-primary-fg);
+  cursor: pointer;
+  transition:
+    background-color var(--bom-duration-fast),
+    border-color var(--bom-duration-fast);
+}
+
+/* bigger hit area without changing layout */
+.bom-checkbox::after {
+  content: '';
+  position: absolute;
+  inset: -0.5rem;
+}
+
+.bom-checkbox:focus-visible {
+  outline: 2px solid var(--bom-color-ring);
+  outline-offset: 2px;
+}
+
+.bom-checkbox[data-state='checked'],
+.bom-checkbox[data-state='indeterminate'] {
+  border-color: var(--bom-color-primary);
+  background: var(--bom-color-primary);
+}
+
+.bom-checkbox[aria-invalid='true'] {
+  border-color: var(--bom-color-danger);
+}
+
+.bom-checkbox:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.bom-checkbox__indicator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.bom-checkbox__indicator > svg {
+  width: 0.75rem;
+  height: 0.75rem;
+  stroke-width: 3;
+}
