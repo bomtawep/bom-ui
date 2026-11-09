@@ -1,25 +1,33 @@
-'use client'
+"use client"
 
-import type { ReactNode } from 'react'
-import { useController, useFormContext, type FieldPath, type FieldValues } from 'react-hook-form'
-import { useFieldIds } from '../../lib/use-field-ids'
-import { Field, FieldContent, FieldDescription, FieldError, FieldLabel, FieldTitle } from '../Field/Field'
-import { Switch, type SwitchSize } from '../Switch/Switch'
+import * as React from "react"
+import {
+  Controller,
+  useFormContext,
+  type FieldPath,
+  type FieldValues,
+} from "react-hook-form"
+
+import {
+  Field,
+  FieldContent,
+  FieldDescription,
+  FieldError,
+  FieldLabel,
+  FieldTitle,
+} from "../Field/Field"
+import { Switch } from "../Switch/Switch"
 
 export type RHFSwitchProps<TFieldValues extends FieldValues = FieldValues> = {
   name: FieldPath<TFieldValues>
-  label: ReactNode
-  description?: ReactNode
-  /** 'start' = label left, switch right (default); 'end' = switch before the label. */
-  labelPosition?: 'start' | 'end'
-  /** 'card' = the whole card is the label, click anywhere to toggle. */
-  variant?: 'default' | 'card'
-  size?: SwitchSize
+  label: React.ReactNode
+  description?: React.ReactNode
+  // "start" = label อยู่ซ้าย switch อยู่ขวา (ค่าเริ่มต้น), "end" = switch อยู่หน้า label
+  labelPosition?: "start" | "end"
+  // "card" = ทั้งการ์ดเป็น label กดตรงไหนก็สลับได้ (Choice Card ในเอกสาร shadcn)
+  variant?: "default" | "card"
+  size?: "sm" | "default"
   disabled?: boolean
-  /**
-   * Radix sets aria-required, but Chrome does not announce required on role="switch" —
-   * say it in the label or description too if it matters.
-   */
   required?: boolean
   className?: string
 }
@@ -28,73 +36,98 @@ export function RHFSwitch<TFieldValues extends FieldValues = FieldValues>({
   name,
   label,
   description,
-  labelPosition = 'start',
-  variant = 'default',
+  labelPosition = "start",
+  variant = "default",
   size,
   disabled,
   required,
   className,
 }: RHFSwitchProps<TFieldValues>) {
   const { control } = useFormContext<TFieldValues>()
-  const { field, fieldState } = useController({ name, control })
-  const invalid = fieldState.invalid
-  const isDisabled = disabled || field.disabled
-  const isCard = variant === 'card'
-  const { fieldId, labelId, descriptionId, errorId, describedBy } = useFieldIds('rhf-switch', name, {
-    description,
-    invalid,
-  })
+  // useId กัน id ชนเมื่อ name เดียวกันอยู่หลายที่ในหน้า (เช่น form ใน dialog + หน้าที่ซ่อนด้วย <Activity>)
+  const uid = React.useId()
+  const fieldId = `rhf-switch-${name}-${uid}`
 
-  const switchEl = (
-    <Switch
-      id={fieldId}
-      ref={field.ref}
-      name={field.name}
-      checked={!!field.value}
-      onCheckedChange={field.onChange}
-      onBlur={field.onBlur}
-      disabled={isDisabled}
-      required={required}
-      size={size}
-      aria-invalid={invalid}
-      aria-describedby={describedBy}
-      // card: the label wraps the whole card and would include the description, so name it by the title only
-      aria-labelledby={isCard ? labelId : undefined}
+  return (
+    <Controller
+      name={name}
+      control={control}
+      render={({ field, fieldState }) => {
+        const invalid = fieldState.invalid
+        const isDisabled = disabled || field.disabled
+        const isCard = variant === "card"
+        const titleId = `${fieldId}-title`
+        const descriptionId = `${fieldId}-description`
+        const errorId = `${fieldId}-error`
+        // ให้ screen reader อ่านคำอธิบายและข้อความ error ต่อจากชื่อช่อง
+        const describedBy =
+          [description && descriptionId, invalid && errorId]
+            .filter(Boolean)
+            .join(" ") || undefined
+
+        const control = (
+          <Switch
+            id={fieldId}
+            ref={field.ref}
+            name={field.name}
+            checked={!!field.value}
+            onCheckedChange={field.onChange}
+            onBlur={field.onBlur}
+            disabled={isDisabled}
+            // Radix ใส่ aria-required ให้ปุ่มเอง แต่ Chrome ไม่ประกาศ required ของ role="switch"
+            // ถ้าต้องให้ผู้ใช้ screen reader รู้ ให้เขียนไว้ใน label หรือ description ด้วย
+            required={required}
+            size={size}
+            aria-invalid={invalid}
+            aria-describedby={describedBy}
+            // card: label ครอบทั้งการ์ด ชื่อจะรวมคำอธิบายเข้าไปด้วย จึงชี้ชื่อไปที่ title อย่างเดียว
+            aria-labelledby={isCard ? titleId : undefined}
+          />
+        )
+
+        const content = (
+          <FieldContent>
+            {isCard ? (
+              <FieldTitle id={titleId}>{label}</FieldTitle>
+            ) : (
+              <FieldLabel htmlFor={fieldId}>{label}</FieldLabel>
+            )}
+            {description && (
+              <FieldDescription id={descriptionId}>{description}</FieldDescription>
+            )}
+            {invalid && <FieldError id={errorId} errors={[fieldState.error]} />}
+          </FieldContent>
+        )
+
+        const row = (
+          <Field
+            orientation="horizontal"
+            data-invalid={invalid || undefined}
+            data-disabled={isDisabled || undefined}
+            className={isCard ? undefined : className}
+          >
+            {labelPosition === "end" ? (
+              <>
+                {control}
+                {content}
+              </>
+            ) : (
+              <>
+                {content}
+                {control}
+              </>
+            )}
+          </Field>
+        )
+
+        return isCard ? (
+          <FieldLabel htmlFor={fieldId} className={className}>
+            {row}
+          </FieldLabel>
+        ) : (
+          row
+        )
+      }}
     />
-  )
-  const content = (
-    <FieldContent>
-      {isCard ? <FieldTitle id={labelId}>{label}</FieldTitle> : <FieldLabel htmlFor={fieldId}>{label}</FieldLabel>}
-      {description && <FieldDescription id={descriptionId}>{description}</FieldDescription>}
-      {invalid && <FieldError id={errorId} errors={[fieldState.error]} />}
-    </FieldContent>
-  )
-  const row = (
-    <Field
-      orientation="horizontal"
-      data-invalid={invalid || undefined}
-      data-disabled={isDisabled || undefined}
-      className={isCard ? undefined : className}
-    >
-      {labelPosition === 'end' ? (
-        <>
-          {switchEl}
-          {content}
-        </>
-      ) : (
-        <>
-          {content}
-          {switchEl}
-        </>
-      )}
-    </Field>
-  )
-
-  return isCard ? (
-    <FieldLabel htmlFor={fieldId} className={className}>
-      {row}
-    </FieldLabel>
-  ) : (
-    row
   )
 }

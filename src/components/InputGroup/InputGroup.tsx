@@ -1,103 +1,163 @@
-'use client'
+"use client"
 
-import { forwardRef, type HTMLAttributes, type MouseEvent } from 'react'
-import { cn } from '../../lib/cn'
-import { Button, type ButtonProps } from '../Button/Button'
-import { Input, type InputProps } from '../Input/Input'
-import { Textarea, type TextareaProps } from '../Textarea/Textarea'
+import * as React from "react"
+import { cva, type VariantProps } from "class-variance-authority"
+import { cn } from "cn"
 
-export type InputGroupProps = HTMLAttributes<HTMLDivElement>
+import { Button } from "../Button/Button"
+import { Input } from "../Input/Input"
+import { Textarea } from "../Textarea/Textarea"
 
-/** One bordered box holding an input/textarea plus addons (text, icons, buttons). */
-export const InputGroup = forwardRef<HTMLDivElement, InputGroupProps>(function InputGroup({ className, ...props }, ref) {
-  return <div ref={ref} role="group" className={cn('bom-input-group', className)} {...props} />
-})
-
-InputGroup.displayName = 'InputGroup'
-
-export type InputGroupAddonAlign = 'inline-start' | 'inline-end' | 'block-start' | 'block-end'
-
-export interface InputGroupAddonProps extends HTMLAttributes<HTMLDivElement> {
-  align?: InputGroupAddonAlign
-}
-
-export const InputGroupAddon = forwardRef<HTMLDivElement, InputGroupAddonProps>(function InputGroupAddon(
-  { align = 'inline-start', className, onClick, ...props },
-  ref,
-) {
-  const handleClick = (e: MouseEvent<HTMLDivElement>) => {
-    onClick?.(e)
-    if (e.defaultPrevented || (e.target as HTMLElement).closest('button')) return
-    // Clicking the addon's text focuses the control, like clicking a label
-    e.currentTarget.parentElement?.querySelector<HTMLElement>('input, textarea')?.focus()
-  }
+function InputGroup({ className, ...props }: React.ComponentProps<"div">) {
   return (
     <div
-      ref={ref}
+      data-slot="input-group"
       role="group"
-      data-align={align}
-      className={cn('bom-input-group__addon', `bom-input-group__addon--${align}`, className)}
-      onClick={handleClick}
+      className={cn(
+        "group/input-group relative flex h-8 w-full min-w-0 items-center rounded-lg border border-input transition-colors outline-none in-data-[slot=combobox-content]:focus-within:border-inherit in-data-[slot=combobox-content]:focus-within:ring-0 has-disabled:bg-input/50 has-disabled:opacity-50 has-[[data-slot=input-group-control]:focus-visible]:border-ring has-[[data-slot=input-group-control]:focus-visible]:ring-3 has-[[data-slot=input-group-control]:focus-visible]:ring-ring/50 has-[[data-slot][aria-invalid=true]]:border-destructive has-[[data-slot][aria-invalid=true]]:ring-3 has-[[data-slot][aria-invalid=true]]:ring-destructive/20 has-[>[data-align=block-end]]:h-auto has-[>[data-align=block-end]]:flex-col has-[>[data-align=block-start]]:h-auto has-[>[data-align=block-start]]:flex-col has-[>textarea]:h-auto dark:bg-input/30 dark:has-disabled:bg-input/80 dark:has-[[data-slot][aria-invalid=true]]:ring-destructive/40 has-[>[data-align=block-end]]:[&>input]:pt-3 has-[>[data-align=block-start]]:[&>input]:pb-3 has-[>[data-align=inline-end]]:[&>input]:pr-1.5 has-[>[data-align=inline-start]]:[&>input]:pl-1.5",
+        className
+      )}
       {...props}
     />
   )
-})
-
-InputGroupAddon.displayName = 'InputGroupAddon'
-
-export type InputGroupButtonSize = 'xs' | 'sm' | 'icon-xs' | 'icon-sm'
-
-export interface InputGroupButtonProps extends Omit<ButtonProps, 'size'> {
-  size?: InputGroupButtonSize
 }
 
-export const InputGroupButton = forwardRef<HTMLButtonElement, InputGroupButtonProps>(function InputGroupButton(
-  { variant = 'ghost', size = 'xs', className, ...props },
-  ref,
-) {
+const inputGroupAddonVariants = cva(
+  "flex h-auto cursor-text items-center justify-center gap-2 py-1.5 text-sm font-medium text-muted-foreground select-none group-data-[disabled=true]/input-group:opacity-50 [&>kbd]:rounded-[calc(var(--radius)-5px)] [&>svg:not([class*='size-'])]:size-4",
+  {
+    variants: {
+      align: {
+        "inline-start":
+          "order-first pl-2 has-[>button]:ml-[-0.3rem] has-[>kbd]:ml-[-0.15rem]",
+        "inline-end":
+          "order-last pr-2 has-[>button]:mr-[-0.3rem] has-[>kbd]:mr-[-0.15rem]",
+        "block-start":
+          "order-first w-full justify-start px-2.5 pt-2 group-has-[>input]/input-group:pt-2 [.border-b]:pb-2",
+        "block-end":
+          "order-last w-full justify-start px-2.5 pb-2 group-has-[>input]/input-group:pb-2 [.border-t]:pt-2",
+      },
+    },
+    defaultVariants: {
+      align: "inline-start",
+    },
+  }
+)
+
+function InputGroupAddon({
+  className,
+  align = "inline-start",
+  ...props
+}: React.ComponentProps<"div"> & VariantProps<typeof inputGroupAddonVariants>) {
   return (
-    <Button
-      ref={ref}
-      variant={variant}
-      size="sm"
-      data-size={size}
-      className={cn('bom-input-group__button', `bom-input-group__button--${size}`, className)}
+    <div
+      role="group"
+      data-slot="input-group-addon"
+      data-align={align}
+      className={cn(inputGroupAddonVariants({ align }), className)}
+      onClick={(e) => {
+        if ((e.target as HTMLElement).closest("button")) {
+          return
+        }
+        e.currentTarget.parentElement?.querySelector("input")?.focus()
+      }}
       {...props}
     />
   )
-})
+}
 
-InputGroupButton.displayName = 'InputGroupButton'
+const inputGroupButtonVariants = cva(
+  "flex items-center gap-2 text-sm shadow-none",
+  {
+    variants: {
+      size: {
+        xs: "h-6 gap-1 rounded-[calc(var(--radius)-3px)] px-1.5 [&>svg:not([class*='size-'])]:size-3.5",
+        sm: "",
+        "icon-xs":
+          "size-6 rounded-[calc(var(--radius)-3px)] p-0 has-[>svg]:p-0",
+        "icon-sm": "size-8 p-0 has-[>svg]:p-0",
+      },
+    },
+    defaultVariants: {
+      size: "xs",
+    },
+  }
+)
 
-export type InputGroupTextProps = HTMLAttributes<HTMLSpanElement>
+function InputGroupButton({
+  className,
+  type = "button",
+  variant = "ghost",
+  size = "xs",
+  ...props
+}: Omit<React.ComponentProps<typeof Button>, "size"> &
+  VariantProps<typeof inputGroupButtonVariants>) {
+  return (
+    <Button
+      type={type}
+      data-size={size}
+      variant={variant}
+      className={cn(inputGroupButtonVariants({ size }), className)}
+      {...props}
+    />
+  )
+}
 
-export const InputGroupText = forwardRef<HTMLSpanElement, InputGroupTextProps>(function InputGroupText(
-  { className, ...props },
-  ref,
-) {
-  return <span ref={ref} className={cn('bom-input-group__text', className)} {...props} />
-})
+function InputGroupText({ className, ...props }: React.ComponentProps<"span">) {
+  return (
+    <span
+      className={cn(
+        "flex items-center gap-2 text-sm text-muted-foreground [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4",
+        className
+      )}
+      {...props}
+    />
+  )
+}
 
-InputGroupText.displayName = 'InputGroupText'
+function InputGroupInput({
+  className,
+  ...props
+}: React.ComponentProps<"input">) {
+  return (
+    <Input
+      data-slot="input-group-control"
+      className={cn(
+        "flex-1 rounded-none border-0 bg-transparent shadow-none ring-0 focus-visible:ring-0 disabled:bg-transparent aria-invalid:ring-0 dark:bg-transparent dark:disabled:bg-transparent",
+        className
+      )}
+      {...props}
+    />
+  )
+}
 
-export type InputGroupInputProps = InputProps
+function InputGroupTextarea({
+  className,
+  ...props
+}: React.ComponentProps<"textarea">) {
+  return (
+    <Textarea
+      data-slot="input-group-control"
+      className={cn(
+        "flex-1 resize-none rounded-none border-0 bg-transparent py-2 shadow-none ring-0 focus-visible:ring-0 disabled:bg-transparent aria-invalid:ring-0 dark:bg-transparent dark:disabled:bg-transparent",
+        className
+      )}
+      {...props}
+    />
+  )
+}
 
-export const InputGroupInput = forwardRef<HTMLInputElement, InputGroupInputProps>(function InputGroupInput(
-  { className, ...props },
-  ref,
-) {
-  return <Input ref={ref} className={cn('bom-input-group__control', className)} {...props} />
-})
+export {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupButton,
+  InputGroupText,
+  InputGroupInput,
+  InputGroupTextarea,
+}
 
-InputGroupInput.displayName = 'InputGroupInput'
-
-export type InputGroupTextareaProps = TextareaProps
-
-export const InputGroupTextarea = forwardRef<HTMLTextAreaElement, InputGroupTextareaProps>(function InputGroupTextarea(
-  { className, ...props },
-  ref,
-) {
-  return <Textarea ref={ref} className={cn('bom-input-group__control', className)} {...props} />
-})
-
-InputGroupTextarea.displayName = 'InputGroupTextarea'
+export type InputGroupProps = React.ComponentProps<typeof InputGroup>
+export type InputGroupAddonProps = React.ComponentProps<typeof InputGroupAddon>
+export type InputGroupButtonProps = React.ComponentProps<typeof InputGroupButton>
+export type InputGroupTextProps = React.ComponentProps<typeof InputGroupText>
+export type InputGroupInputProps = React.ComponentProps<typeof InputGroupInput>
+export type InputGroupTextareaProps = React.ComponentProps<typeof InputGroupTextarea>

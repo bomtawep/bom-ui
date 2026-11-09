@@ -73,7 +73,7 @@ describe('RHFDatePicker', () => {
     await userEvent.type(screen.getByRole('textbox', { name: 'วันที่' }), '31/02/2569')
     expect(Number.isNaN((form.methods!.getValues('d') as Date).getTime())).toBe(true)
     await userEvent.click(screen.getByRole('button', { name: 'submit' }))
-    expect(await screen.findByText('เลือกวันที่', { selector: '.bom-field__error' })).toBeInTheDocument()
+    expect(await screen.findByText('เลือกวันที่', { selector: '[data-slot="field-error"]' })).toBeInTheDocument()
   })
 
   it('input variant: re-formats the text on blur', async () => {
@@ -109,7 +109,7 @@ describe('RHFDatePicker', () => {
   it('shows the schema error linked to the control', async () => {
     renderForm<Values>(schema as never, { d: null }, <RHFDatePicker name="d" label="วันที่" description="วันเริ่มงาน" />)
     await userEvent.click(screen.getByRole('button', { name: 'submit' }))
-    await screen.findByText('เลือกวันที่', { selector: '.bom-field__error' })
+    await screen.findByText('เลือกวันที่', { selector: '[data-slot="field-error"]' })
     const trigger = screen.getByRole('button', { name: /^วันที่/ })
     expect(trigger).toHaveAttribute('aria-invalid', 'true')
     expect(trigger).toHaveAccessibleDescription('วันเริ่มงาน เลือกวันที่')

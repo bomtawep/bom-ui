@@ -1,23 +1,35 @@
-'use client'
+"use client"
 
-import { forwardRef, type ComponentPropsWithoutRef, type ComponentRef } from 'react'
-import { Checkbox as CheckboxPrimitive } from 'radix-ui'
-import { cn } from '../../lib/cn'
-import { CheckIcon, MinusIcon } from '../../lib/icons'
+import * as React from "react"
+import { cn } from "cn"
+import { Checkbox as CheckboxPrimitive } from "radix-ui"
+import { CheckIcon, MinusIcon } from "lucide-react"
 
-export type CheckboxProps = ComponentPropsWithoutRef<typeof CheckboxPrimitive.Root>
-
-export const Checkbox = forwardRef<ComponentRef<typeof CheckboxPrimitive.Root>, CheckboxProps>(function Checkbox(
-  { className, checked, ...props },
-  ref,
-) {
+function Checkbox({
+  className,
+  ...props
+}: React.ComponentProps<typeof CheckboxPrimitive.Root>) {
   return (
-    <CheckboxPrimitive.Root ref={ref} checked={checked} className={cn('bom-checkbox', className)} {...props}>
-      <CheckboxPrimitive.Indicator className="bom-checkbox__indicator">
-        {checked === 'indeterminate' ? <MinusIcon /> : <CheckIcon />}
+    <CheckboxPrimitive.Root
+      data-slot="checkbox"
+      className={cn(
+        "peer relative flex size-4 shrink-0 items-center justify-center rounded-[4px] border border-input transition-colors outline-none group-has-disabled/field:opacity-50 group-has-[:focus-visible]/field-label:ring-0 group-has-[:focus-visible]/field-label:not-data-checked:border-input after:absolute after:-inset-x-3 after:-inset-y-2 focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 aria-invalid:aria-checked:border-primary dark:bg-input/30 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 data-checked:border-primary data-checked:bg-primary data-checked:text-primary-foreground group-has-[:focus-visible]/field-label:data-checked:border-primary dark:data-checked:bg-primary data-[state=indeterminate]:border-primary data-[state=indeterminate]:bg-primary data-[state=indeterminate]:text-primary-foreground dark:data-[state=indeterminate]:bg-primary",
+        className
+      )}
+      {...props}
+    >
+      <CheckboxPrimitive.Indicator
+        data-slot="checkbox-indicator"
+        className="group/checkbox-indicator grid place-content-center text-current transition-none [&>svg]:size-3.5"
+      >
+        {/* indeterminate (เช่น "เลือกทั้งหมด" ที่เลือกไว้บางแถว) แสดงขีดแทนเครื่องหมายถูก */}
+        <CheckIcon className="group-data-[state=indeterminate]/checkbox-indicator:hidden" />
+        <MinusIcon className="hidden group-data-[state=indeterminate]/checkbox-indicator:block" />
       </CheckboxPrimitive.Indicator>
     </CheckboxPrimitive.Root>
   )
-})
+}
 
-Checkbox.displayName = 'Checkbox'
+export { Checkbox }
+
+export type CheckboxProps = React.ComponentProps<typeof Checkbox>

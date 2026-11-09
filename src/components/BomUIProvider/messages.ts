@@ -10,6 +10,8 @@ export interface BomUIMessages {
   openCalendar: string
   time: string
   pagination: string
+  previous: string
+  next: string
   previousPage: string
   nextPage: string
   morePages: string
@@ -36,6 +38,8 @@ export const defaultMessages: BomUIMessages = {
   openCalendar: 'เปิดปฏิทิน',
   time: 'เวลา',
   pagination: 'การแบ่งหน้า',
+  previous: 'ก่อนหน้า',
+  next: 'ถัดไป',
   previousPage: 'หน้าก่อนหน้า',
   nextPage: 'หน้าถัดไป',
   morePages: 'หน้าอื่น ๆ',

@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import { XIcon } from '../../lib/icons'
+import { SearchIcon, XIcon } from 'lucide-react'
 import {
   InputGroup,
   InputGroupAddon,
@@ -20,7 +20,7 @@ type Story = StoryObj<typeof meta>
 
 export const Examples: Story = {
   render: () => (
-    <div style={{ display: 'grid', gap: '1rem', maxWidth: 380 }}>
+    <div className="grid max-w-sm gap-4">
       <InputGroup>
         <InputGroupInput aria-label="Website" placeholder="example.com" />
         <InputGroupAddon>
@@ -28,11 +28,10 @@ export const Examples: Story = {
         </InputGroupAddon>
       </InputGroup>
       <InputGroup>
-        <InputGroupInput aria-label="Amount" placeholder="0.00" />
-        <InputGroupAddon align="inline-end">บาท</InputGroupAddon>
-      </InputGroup>
-      <InputGroup>
         <InputGroupInput aria-label="Search" placeholder="ค้นหา" />
+        <InputGroupAddon>
+          <SearchIcon />
+        </InputGroupAddon>
         <InputGroupAddon align="inline-end">
           <InputGroupButton size="icon-xs" aria-label="ล้าง">
             <XIcon />
@@ -43,14 +42,10 @@ export const Examples: Story = {
         <InputGroupTextarea aria-label="Message" placeholder="พิมพ์ข้อความ" />
         <InputGroupAddon align="block-end">
           <InputGroupText>0/280</InputGroupText>
-          <InputGroupButton variant="primary" style={{ marginLeft: 'auto' }}>
+          <InputGroupButton variant="default" className="ml-auto">
             ส่ง
           </InputGroupButton>
         </InputGroupAddon>
-      </InputGroup>
-      <InputGroup>
-        <InputGroupInput aria-label="Invalid" aria-invalid defaultValue="bad" />
-        <InputGroupAddon align="inline-end">@</InputGroupAddon>
       </InputGroup>
     </div>
   ),

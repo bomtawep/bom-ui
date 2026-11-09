@@ -75,8 +75,8 @@ describe('RHFInput', () => {
       { email: '' },
       <RHFInput name="email" label="Email" startAddon="@" append={<button type="button">Go</button>} attachAppend />,
     )
-    expect(container.querySelector('.bom-input-group')).toBeInTheDocument()
-    expect(container.querySelector('.bom-button-group')).toHaveClass('bom-button-group--full')
+    expect(container.querySelector('[data-slot="input-group"]')).toBeInTheDocument()
+    expect(container.querySelector('[data-slot="button-group"]')).toBeInTheDocument()
   })
 
   it('separates a non-attached append with a gap', () => {
@@ -85,7 +85,8 @@ describe('RHFInput', () => {
       { email: '' },
       <RHFInput name="email" label="Email" append={<button type="button">Go</button>} />,
     )
-    expect(container.querySelector('.bom-field__append')).toBeInTheDocument()
+    expect(container.querySelector('[data-slot="button-group"]')).toBeNull()
+    expect(screen.getByRole('button', { name: 'Go' }).parentElement).toHaveClass('flex', 'gap-2')
   })
 
   it('supports a horizontal layout and hidden label', () => {
@@ -94,8 +95,8 @@ describe('RHFInput', () => {
       { email: '' },
       <RHFInput name="email" label="Email" hideLabel orientation="horizontal" />,
     )
-    expect(container.querySelector('.bom-field--horizontal')).toBeInTheDocument()
-    expect(screen.getByText('Email')).toHaveClass('bom-sr-only')
+    expect(container.querySelector('[data-slot="field"][data-orientation="horizontal"]')).toBeInTheDocument()
+    expect(screen.getByText('Email')).toHaveClass('sr-only')
   })
 
   it('has no a11y violations with an error', async () => {

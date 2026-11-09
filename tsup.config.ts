@@ -1,26 +1,14 @@
-import { readdir, readFile, writeFile } from 'node:fs/promises'
+import { copyFile, readFile, writeFile } from 'node:fs/promises'
 import { defineConfig } from 'tsup'
 
-// dist/styles.css = tokens + src/components/<Name>/<Name>.css (alphabetical).
-// Consumers import it once: `import '@bomtawep/ui/styles.css'`.
-async function bundleCss() {
-  const entries = await readdir('src/components', { withFileTypes: true })
-  const names = entries
-    .filter((e) => e.isDirectory())
-    .map((e) => e.name)
-    .sort()
-  const parts = [await readFile('src/styles/tokens.css', 'utf8')]
-  for (const name of names) {
-    const dir = `src/components/${name}`
-    const cssFiles = (await readdir(dir)).filter((f) => f.endsWith('.css'))
-    for (const file of cssFiles) {
-      if (file !== `${name}.css`) {
-        throw new Error(`${dir}/${file}: component CSS must be named ${name}.css to be bundled into dist/styles.css`)
-      }
-    }
-    if (cssFiles.includes(`${name}.css`)) parts.push(await readFile(`${dir}/${name}.css`, 'utf8'))
-  }
-  await writeFile('dist/styles.css', parts.join('\n'))
+// Tailwind source CSS for consumers to compile (they need Tailwind CSS v4):
+//   dist/theme.css  = shadcn theme + `@source` for the components
+//   dist/source.css = `@source` only, for apps that already have their own shadcn theme
+async function writeCss() {
+  const source = '\n/* Let Tailwind find the classes used by @bomtawep/ui */\n@source "./";\n'
+  await copyFile('src/styles/shadcn-tailwind.css', 'dist/shadcn-tailwind.css')
+  await writeFile('dist/theme.css', (await readFile('src/styles/theme.css', 'utf8')) + source)
+  await writeFile('dist/source.css', source.trimStart())
 }
 
 export default defineConfig({
@@ -29,8 +17,8 @@ export default defineConfig({
   dts: true,
   sourcemap: true,
   clean: true,
-  external: ['react', 'react-dom', 'next', 'react-hook-form'],
+  external: ['react', 'react-dom', 'next', 'react-hook-form', 'tailwindcss'],
   // Directives are stripped during bundling; re-add so App Router treats the bundle as client code.
   banner: { js: "'use client'" },
-  onSuccess: bundleCss,
+  onSuccess: writeCss,
 })

@@ -1,8 +1,0 @@
-/* Layout and animation come from Dialog.css (.bom-dialog*); only the differences live here. */
-.bom-alert-dialog {
-  max-width: 28rem;
-}
-
-.bom-alert-dialog__header {
-  padding-right: 0;
-}

@@ -80,7 +80,7 @@ Rules:
 
 ## `.github/workflows/ci.yml` (ทุก PR)
 
-ต้องรัน `yarn install --immutable` → `yarn typecheck` → `yarn test` → `yarn build` → `check-dist.sh` → `check-css.sh` → `yarn pack --dry-run` → `yarn build-storybook` เพื่อตรวจว่าไฟล์ที่จะ publish ครบ (มี `dist/`, ไม่มี `src/` หรือไฟล์ลับ)
+ต้องรัน `yarn install --immutable` → `yarn typecheck` → `yarn test` → `yarn build` → `check-dist.sh` → `yarn pack --dry-run` → `yarn build-storybook` เพื่อตรวจว่าไฟล์ที่จะ publish ครบ (มี `dist/`, ไม่มี `src/` หรือไฟล์ลับ)
 
 ## การมองเห็น package
 

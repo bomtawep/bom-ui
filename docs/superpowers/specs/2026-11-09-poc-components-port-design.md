@@ -1,7 +1,7 @@
 # Port components จาก poc-dof-pps — `@bomtawep/ui` 0.2.0
 
 - วันที่: 2026-11-09
-- สถานะ: อนุมัติแล้ว (brainstorming) — รอผู้ใช้ review spec
+- สถานะ: ส่วน Styling / API ถูกแทนด้วย [2026-11-09-shadcn-tailwind-design.md](2026-11-09-shadcn-tailwind-design.md) (1.0.0)
 - เวอร์ชันปัจจุบัน: 0.1.7 (มี `Button` + Phase 1 Foundation)
 - ต้นทาง: `gitlab.finema.co/team/poc-dof-pps` → `frontend/src/components/{ui,hook-form}` + `page-header`, `error-state`, `simple-pagination`, `pdf-preview`
 - แทนที่: ช่วง 2–5 ใน [2026-11-05-component-library-design.md](2026-11-05-component-library-design.md) (ทำรวมใน release เดียว) และยกเลิกข้อ "นอกขอบเขต" เรื่อง DatePicker / form-library integration

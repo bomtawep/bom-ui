@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import { Badge, type BadgeVariant } from './Badge'
+import { Badge } from './Badge'
 
-const variants: BadgeVariant[] = ['primary', 'secondary', 'outline', 'info', 'success', 'warning', 'danger']
+const variants = ['default', 'secondary', 'destructive', 'outline', 'ghost', 'link'] as const
 
 // Storybook requires a default export for meta; the library itself uses named exports only.
 const meta = {
@@ -18,7 +18,7 @@ export const Playground: Story = {}
 
 export const Variants: Story = {
   render: () => (
-    <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+    <div className="flex flex-wrap gap-2">
       {variants.map((v) => (
         <Badge key={v} variant={v}>
           {v}

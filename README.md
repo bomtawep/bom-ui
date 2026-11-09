@@ -1,6 +1,12 @@
 # @bomtawep/ui
 
-React component library สำหรับ Next.js (App Router / Pages Router) — เผยแพร่ผ่าน GitHub Packages
+React component library สำหรับ Next.js (App Router / Pages Router) — **โค้ด [shadcn/ui](https://ui.shadcn.com) (style `radix-nova`) บน Tailwind CSS v4** เผยแพร่ผ่าน GitHub Packages ติดตั้งแบบ semver ได้ (`^1.0.0`)
+
+## ต้องมี
+
+- React 19 / Next.js 15+
+- **Tailwind CSS v4** ในโปรเจกต์ปลายทาง
+- `react-hook-form` (peer — ใช้กับ RHF* components)
 
 ## ติดตั้ง (Yarn 4)
 
@@ -21,7 +27,7 @@ React component library สำหรับ Next.js (App Router / Pages Router) �
    export NPM_TOKEN=<token>
    ```
 
-3. ติดตั้ง (`react-hook-form` เป็น peerDependency ตั้งแต่ 0.2.0)
+3. ติดตั้ง
 
    ```bash
    yarn add @bomtawep/ui react-hook-form
@@ -29,18 +35,63 @@ React component library สำหรับ Next.js (App Router / Pages Router) �
 
 ใช้ npm หรือ Yarn 1? ใช้ `.npmrc` แทน — ดู [.claude/rules/05-consumer-setup.md](.claude/rules/05-consumer-setup.md)
 
+## ตั้งค่า Tailwind
+
+```css
+/* app/globals.css */
+@import "tailwindcss";
+@import "@bomtawep/ui/theme.css";
+```
+
+`theme.css` = theme ของ shadcn (neutral, ตัวแปร `--primary`, `--radius`, … ทั้ง light / `.dark`) + custom variants ที่ component ใช้ + `@source` ให้ Tailwind สแกน class ของ library
+
+**มี theme shadcn ของตัวเองอยู่แล้ว?** ใช้ `source.css` แทน — ได้แค่ `@source` และใช้สีของโปรเจกต์คุณ (ต้องมี custom variants ของ shadcn เช่นจาก `@import "shadcn/tailwind.css"`):
+
+```css
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+@import "@bomtawep/ui/source.css";
+/* …:root / .dark ของคุณ… */
+```
+
+### Dark mode
+
+ใส่ class `dark` ที่ `<html>` แบบ shadcn — ถ้าใช้ next-themes:
+
+```tsx
+<ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+  {children}
+</ThemeProvider>
+```
+
+### เปลี่ยนสี
+
+override ตัวแปร shadcn หลัง import:
+
+```css
+:root {
+  --primary: oklch(0.55 0.22 293);
+  --radius: 0.75rem;
+}
+```
+
+ใช้ [shadcn themes](https://ui.shadcn.com/themes) แล้ว copy `:root` / `.dark` มาวางได้เลย
+
 ## ใช้งาน
 
 ```tsx
 // app/layout.tsx
-import '@bomtawep/ui/styles.css'
-import { BomUIProvider, Toaster } from '@bomtawep/ui'
+import './globals.css'
+import { BomUIProvider, Toaster, TooltipProvider } from '@bomtawep/ui'
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="th">
+    <html lang="th" suppressHydrationWarning>
       <body>
-        <BomUIProvider>{children}</BomUIProvider>
+        <BomUIProvider>
+          <TooltipProvider>{children}</TooltipProvider>
+        </BomUIProvider>
         <Toaster />
       </body>
     </html>
@@ -58,43 +109,49 @@ export default function Page() {
         <CardTitle>ใบแจ้งหนี้</CardTitle>
       </CardHeader>
       <CardContent>
-        <Button>ชำระเงิน</Button>
+        <Button variant="outline">ชำระเงิน</Button>
       </CardContent>
     </Card>
   )
 }
 ```
 
-ดูตัวอย่างทุก component ได้ใน Storybook (`yarn storybook`)
+API ตามเอกสาร shadcn ทุกประการ — snippet จาก [ui.shadcn.com](https://ui.shadcn.com/docs/components) ใช้ได้โดยเปลี่ยน import เป็น `@bomtawep/ui` · ดูตัวอย่างทั้งหมดใน Storybook (`yarn storybook`)
 
 ### Components
 
 | กลุ่ม | Component |
 |---|---|
-| Primitives | `Button` (`loading`, `asChild`), `IconButton`, `ButtonGroup`, `Badge`, `Spinner`, `Kbd`, `Avatar`, `Card`, `Separator`, `Skeleton` |
+| Primitives | `Button`, `ButtonGroup`, `Badge`, `Spinner`, `Kbd`, `Avatar`, `Card`, `Separator`, `Skeleton` |
 | Form | `Label`, `Input`, `Textarea`, `Checkbox`, `RadioGroup`, `Switch`, `Select`, `InputGroup`, `InputOTP`, `Calendar`, `Field` (+`FieldSet`, `FieldLegend`, `FieldGroup`, `FieldLabel`, `FieldDescription`, `FieldError`, …) |
-| Overlay | `Dialog`, `AlertDialog`, `Sheet`, `Popover`, `Tooltip`, `DropdownMenu`, `Toaster` + `toast()` |
-| Navigation & data | `Tabs`, `Accordion`, `Breadcrumb`, `Pagination`, `Table`, `Alert` |
-| App | `PageHeader`, `EmptyState`, `ErrorState`, `PdfPreview`, `Sidebar` (+`SidebarProvider`, `useSidebar`, …) |
+| Overlay | `Dialog`, `AlertDialog`, `Sheet`, `Popover`, `Tooltip` (+`TooltipProvider`), `DropdownMenu`, `Toaster` + `toast()` |
+| Navigation & data | `Tabs`, `Accordion`, `Breadcrumb`, `Pagination`, `Table`, `Alert`, `Empty` |
+| App | `Sidebar` (+`SidebarProvider`, `useSidebar`, …), `PageHeader`, `ErrorState`, `PdfPreview` |
 | react-hook-form | `FormProvider`, `RHFInput`, `RHFInputGroup`, `RHFTextArea`, `RHFSelect`, `RHFCheckbox`, `RHFRadioGroup`, `RHFSwitch`, `RHFInputOTP`, `RHFDatePicker`, `RHFDateRangePicker` |
 
-ทุก component รับ `className` (ต่อท้าย class ของ library) และ `ref` · sub-component เป็นชื่อแบน เช่น `DialogContent` (ไม่ใช่ `Dialog.Content`)
+### ส่วนที่ bom-ui เพิ่มจาก shadcn
+
+- `Button variant="sparkle"` — gradient เคลื่อนไหวสำหรับ CTA (หยุดเมื่อ reduced motion; สีจาก `--sparkle-1/2/3`)
+- `Button loading` — แสดง `Spinner`, `aria-busy`, disabled
+- `IconButton` — `Button` ไอคอนล้วนที่บังคับ `aria-label` ใน type, `size="xs|sm|default|lg"`
+- `getPageItems(page, pageCount, siblingCount?)` — คำนวณเลขหน้า + `"ellipsis"` สำหรับ `Pagination`
+- `PageHeader`, `ErrorState`, `PdfPreview`, RHF* และ `BomUIProvider`
 
 ### ภาษา / locale — `BomUIProvider`
 
-ค่าเริ่มต้นเป็นภาษาไทย ปี พ.ศ. ใช้ได้โดยไม่ต้องครอบ provider ถ้าต้องการเปลี่ยน:
+ค่าเริ่มต้นเป็นภาษาไทย ปี พ.ศ. (ข้อความที่ shadcn hardcode ภาษาอังกฤษ เช่น "Close", "Toggle Sidebar", "Previous" ถูกแทนด้วย `messages`) ใช้ได้โดยไม่ต้องครอบ provider ถ้าต้องการเปลี่ยน:
 
 ```tsx
 import { enUS } from 'react-day-picker/locale'
 
-<BomUIProvider locale={enUS} messages={{ datePickerPlaceholder: 'Pick a date', retry: 'Retry' }}>
+<BomUIProvider locale={enUS} messages={{ close: 'Close', previous: 'Previous', next: 'Next' }}>
   {children}
 </BomUIProvider>
 ```
 
-- `locale` — locale จาก `react-day-picker/locale` ใช้กับ `Calendar` และ date picker ทุกตัว
-- `messages` — ข้อความ UI ทุกตัว (`BomUIMessages`) ส่งเฉพาะที่ต้องการเปลี่ยน ที่เหลือใช้ค่าไทยจาก `defaultMessages`
-- prop ของ component (เช่น `placeholder`, `locale`) ชนะค่าจาก provider เสมอ
+- `locale` — จาก `react-day-picker/locale` ใช้กับ `Calendar` และ date picker ทุกตัว
+- `messages` — ส่งเฉพาะ key ที่ต้องการเปลี่ยน (`BomUIMessages`) ที่เหลือใช้ `defaultMessages`
+- prop ของ component ชนะค่าจาก provider เสมอ
 
 ### ฟอร์มด้วย react-hook-form + zod
 
@@ -126,11 +183,7 @@ export function ProfileForm() {
 }
 ```
 
-RHF* ทุกตัวผูก label, คำอธิบาย และ error ให้ screen reader อ่านอัตโนมัติ (`aria-describedby`, `aria-invalid`) — `label` จำเป็นเสมอ ซ่อนด้วย `hideLabel` ได้ · `FormProvider` ชื่อเดียวกับของ react-hook-form ถ้า import ทั้งสองในไฟล์เดียวให้ตั้ง alias
-
 ### Sidebar — จำสถานะพับ/กาง
-
-`SidebarProvider` เขียน cookie `sidebar_state` ทุกครั้งที่เปลี่ยน อ่านกลับฝั่ง server แล้วส่งเป็น `defaultOpen`:
 
 ```tsx
 // app/(app)/layout.tsx — Server Component
@@ -143,47 +196,9 @@ export default async function Layout({ children }: { children: React.ReactNode }
 }
 ```
 
-ลิงก์ในเมนูใช้ `asChild` กับ `next/link`: `<SidebarMenuButton asChild><Link href="/docs">Docs</Link></SidebarMenuButton>`
+`SidebarMenuButton tooltip` ต้องมี `TooltipProvider` ครอบ (เหมือน shadcn)
 
-### ย้ายมาจาก shadcn/ui
-
-| shadcn | @bomtawep/ui |
-|---|---|
-| `variant="default"` / `"outline"` / `"secondary"` | `primary` / `secondary` / `secondary` |
-| `variant="destructive"` | `danger` |
-| `variant="link"` | ไม่มี — ใช้ `ghost` หรือ `<a>` |
-| `size="default"` | `md` |
-| `size="icon"` / `"icon-sm"` | `<IconButton aria-label="…" size="md" \| "sm">` |
-| `import { toast } from "sonner"` | `import { toast } from '@bomtawep/ui'` |
-| class Tailwind ใน component | ไม่ใช้ — ปรับหน้าตาด้วย `--bom-*` หรือ `className` ของคุณเอง |
-
-## ธีม
-
-ทุกสีและขนาดเป็น CSS variable `--bom-*` override ได้ใน CSS ของโปรเจกต์:
-
-```css
-:root {
-  --bom-color-primary: #7c3aed;
-  --bom-color-primary-hover: #6d28d9;
-  --bom-radius-md: 0.75rem;
-}
-```
-
-ตัวแปรที่ใช้บ่อย: `--bom-color-surface` (พื้น card/popover/dialog), `--bom-color-accent` (hover ของเมนู), `--bom-color-overlay` (พื้นหลัง dialog), `--bom-color-input` (กรอบช่องกรอก), `--bom-color-sidebar*`, `--bom-sidebar-width`, `--bom-control-height-sm|md|lg` — ดูทั้งหมดใน `src/styles/tokens.css`
-
-ค่าเริ่มต้นเป็น light เสมอ เปิด dark mode ด้วย `<html data-theme="dark">` หรือให้ตามระบบปฏิบัติการด้วย `<html data-theme="system">` (`data-theme="light"` บังคับ light)
-
-ถ้าใช้ next-themes ต้องตั้ง `attribute="data-theme"` (ค่าเริ่มต้น `attribute="class"` ใช้กับ tokens นี้ไม่ได้):
-
-```tsx
-<ThemeProvider attribute="data-theme" defaultTheme="system" enableSystem>
-  {children}
-</ThemeProvider>
-```
-
-ใช้ได้ทั้งใน Server Component และ Client Component (bundle มี `'use client'` อยู่แล้ว)
-
-CI / Docker: ดู [.claude/rules/05-consumer-setup.md](.claude/rules/05-consumer-setup.md)
+ใช้ได้ทั้งใน Server Component และ Client Component (bundle มี `'use client'` อยู่แล้ว) · CI / Docker: ดู [.claude/rules/05-consumer-setup.md](.claude/rules/05-consumer-setup.md)
 
 ## พัฒนา
 

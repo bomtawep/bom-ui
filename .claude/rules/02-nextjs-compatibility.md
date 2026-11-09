@@ -15,22 +15,19 @@ Library นี้คือ **React** component library ที่ต้องใ�
 - ใส่ `'use client'` ที่ต้นไฟล์ component ที่เป็น client ด้วย (เพื่อความชัดเจนตอนอ่าน)
 - ถ้าภายหลังต้องการ server-safe components (ไม่มี interactivity) ให้แยก entry point เช่น `@bomtawep/ui/server` ที่ **ไม่มี** banner `'use client'` — ห้ามผสมใน entry เดียว
 
-## Styling
+## Styling — shadcn + Tailwind CSS v4 (ตั้งแต่ 1.0.0)
 
-เลือกแนวทางเดียวแล้วใช้ให้สม่ำเสมอ:
-
-1. **Ship CSS แยก (default)** — build CSS ไปที่ `dist/styles.css` แล้วให้ปลายทาง import ครั้งเดียว
-   ```ts
-   // app/layout.tsx
-   import '@bomtawep/ui/styles.css'
-   ```
-   - สีและขนาดทั้งหมดมาจาก CSS variables ใน `src/styles/tokens.css` (`--bom-color-*`, `--bom-radius-*`, `--bom-space-*`, …) ปลายทาง override ได้ เช่น `:root { --bom-color-primary: #7c3aed; }`
-   - Dark mode เป็น opt-in: ค่าเริ่มต้นเป็น light เสมอ เปิดด้วย `<html data-theme="dark" | "light" | "system">` (`system` = ตาม OS) — CSS ของ library ห้ามตั้ง `color-scheme` บน `:root` และห้าม style `html`/`body`
-   - CSS ของ component ห้ามมีสี hardcode — CI ตรวจด้วย `scripts/check-css.sh`
-2. **Tailwind** — ถ้าใช้ class ของ Tailwind ใน component ปลายทางต้องให้ Tailwind scan package ด้วย
-   - Tailwind v4: `@source "../node_modules/@bomtawep/ui/dist";` ใน CSS
-   - Tailwind v3: เพิ่ม `./node_modules/@bomtawep/ui/dist/**/*.{js,cjs}` ใน `content`
-   - ต้องระบุสิ่งนี้ไว้ใน README ของ library
+- component เป็นโค้ด shadcn/ui (style `radix-nova`, base `neutral`) ใช้ class Tailwind + `cva` + `cn` (แพ็กเกจ `cn`)
+- ปลายทาง**ต้องมี Tailwind v4** และ import CSS ของ library ใน CSS หลัก:
+  ```css
+  @import "tailwindcss";
+  @import "@bomtawep/ui/theme.css";   /* theme shadcn + custom variants + @source */
+  /* หรือ @import "@bomtawep/ui/source.css" ถ้าปลายทางมี theme shadcn ของตัวเอง */
+  ```
+- theme / ตัวแปรสีอยู่ใน `src/styles/theme.css` (ตัวแปร shadcn: `--primary`, `--radius`, …) — ห้ามใส่สี hardcode ใน class ของ component ให้ใช้ token ของ shadcn (`bg-primary`, `text-muted-foreground`, …)
+- custom variants / keyframes ของ shadcn อยู่ใน `src/styles/shadcn-tailwind.css` (copy จาก `shadcn/dist/tailwind.css` — อัปเดตเมื่ออัปเกรด shadcn)
+- Dark mode: class `.dark` ที่ `<html>` (next-themes `attribute="class"`) — เหมือน shadcn
+- ส่วนเสริมที่ต้องใช้ CSS เอง (เช่น `bom-sparkle`) ให้เขียนเป็น `@utility` ใน `theme.css`
 
 ห้ามใช้ CSS-in-JS ที่ต้องมี runtime ฝั่ง server (เช่น styled-components ที่ไม่ได้ตั้ง registry) เพราะทำงานไม่ดีกับ App Router
 

@@ -24,7 +24,7 @@ describe('RHFSelect', () => {
     const { form } = renderForm<Values>(schema, { city: '' }, <RHFSelect name="city" label="City" placeholder="เลือก" options={flat} />)
     const trigger = screen.getByRole('combobox', { name: 'City' })
     expect(trigger).toHaveTextContent('เลือก')
-    expect(trigger).toHaveClass('bom-select__trigger--full')
+    expect(trigger).toHaveClass('w-full')
     trigger.focus()
     await userEvent.keyboard('{Enter}')
     await userEvent.click(await screen.findByRole('option', { name: 'เชียงใหม่' }))
@@ -46,8 +46,8 @@ describe('RHFSelect', () => {
     screen.getByRole('combobox').focus()
     await userEvent.keyboard('{Enter}')
     await screen.findByRole('listbox')
-    expect(screen.getByText('เหนือ')).toHaveClass('bom-select__label')
-    expect(document.querySelector('.bom-select__separator')).toBeInTheDocument()
+    expect(screen.getByText('เหนือ')).toHaveAttribute('data-slot', 'select-label')
+    expect(document.querySelector('[data-slot="select-separator"]')).toBeInTheDocument()
   })
 
   it('announces required and shows the error', async () => {
@@ -66,10 +66,11 @@ describe('RHFSelect', () => {
       { city: '' },
       <RHFSelect name="city" label="City" options={flat} orientation="horizontal" size="sm" triggerClassName="w-40" disabled />,
     )
-    expect(container.querySelector('.bom-field--horizontal')).toBeInTheDocument()
+    expect(container.querySelector('[data-slot="field"][data-orientation="horizontal"]')).toBeInTheDocument()
     const trigger = screen.getByRole('combobox')
-    expect(trigger).toHaveClass('bom-select__trigger--sm', 'w-40')
-    expect(trigger).not.toHaveClass('bom-select__trigger--full')
+    expect(trigger).toHaveAttribute('data-size', 'sm')
+    expect(trigger).toHaveClass('w-40')
+    expect(trigger).not.toHaveClass('w-full')
     expect(trigger).toBeDisabled()
   })
 

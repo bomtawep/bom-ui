@@ -18,10 +18,8 @@ jobs:
       - run: yarn typecheck
       - run: yarn test
       - run: yarn build
-      - name: Check build output ('use client' banner, styles.css)
+      - name: Check build output ('use client' banner, theme.css / source.css)
         run: sh scripts/check-dist.sh
-      - name: Check component CSS uses tokens only
-        run: sh scripts/check-css.sh
       - name: Check package contents
         run: yarn pack --dry-run
       - run: yarn build-storybook

@@ -1,10 +1,14 @@
-'use client'
+"use client"
 
-import { useRef, type ReactNode } from 'react'
-import { useController, useFormContext, type FieldPath, type FieldValues } from 'react-hook-form'
-import { cn } from '../../lib/cn'
-import { useFieldIds } from '../../lib/use-field-ids'
-import { Checkbox } from '../Checkbox/Checkbox'
+import * as React from "react"
+import {
+  Controller,
+  useFormContext,
+  type FieldPath,
+  type FieldValues,
+} from "react-hook-form"
+
+import { Checkbox } from "../Checkbox/Checkbox"
 import {
   Field,
   FieldContent,
@@ -14,48 +18,47 @@ import {
   FieldLegend,
   FieldSet,
   FieldTitle,
-} from '../Field/Field'
-import { RequiredMark } from './RequiredMark'
+} from "../Field/Field"
 
 export type RHFCheckboxOption = {
   value: string
-  label: ReactNode
-  description?: ReactNode
+  label: React.ReactNode
+  description?: React.ReactNode
   disabled?: boolean
 }
 
 type BaseProps<TFieldValues extends FieldValues> = {
   name: FieldPath<TFieldValues>
-  /** Field name (or group legend) — always required for screen readers. Hide it visually with hideLabel. */
-  label: ReactNode
+  // ชื่อช่อง (หรือ legend ของกลุ่ม) ต้องมีเสมอให้ screen reader รู้ว่ากำลังติ๊กอะไร ไม่อยากให้เห็นใช้ hideLabel
+  label: React.ReactNode
   hideLabel?: boolean
-  description?: ReactNode
-  /** 'card' = the whole card is the label, click anywhere to tick. */
-  variant?: 'default' | 'card'
+  description?: React.ReactNode
+  // "card" = ทั้งการ์ดเป็น label กดตรงไหนก็ติ๊กได้ (Choice Card ในเอกสาร shadcn)
+  variant?: "default" | "card"
   disabled?: boolean
   className?: string
 }
 
-/** No options = a single checkbox; the value is a boolean. */
-export type RHFCheckboxSingleProps<TFieldValues extends FieldValues = FieldValues> = BaseProps<TFieldValues> & {
+// ไม่ใส่ options = checkbox เดี่ยว ค่าเป็น boolean
+type SingleProps<TFieldValues extends FieldValues> = BaseProps<TFieldValues> & {
   options?: undefined
   required?: boolean
 }
 
-/**
- * options = a checkbox group; the value is string[] of ticked values.
- * No per-item required (that would force every box) — require at least one with zod `.min(1)`.
- */
-export type RHFCheckboxGroupProps<TFieldValues extends FieldValues = FieldValues> = BaseProps<TFieldValues> & {
+// ใส่ options = กลุ่ม checkbox ค่าเป็น string[] ของ value ที่ติ๊ก
+// ไม่มี required รายตัว (จะกลายเป็นบังคับติ๊กทุกช่อง) บังคับเลือกอย่างน้อยหนึ่งด้วย zod .min(1)
+type GroupProps<TFieldValues extends FieldValues> = BaseProps<TFieldValues> & {
   options: RHFCheckboxOption[]
-  orientation?: 'vertical' | 'horizontal'
+  orientation?: "vertical" | "horizontal"
 }
 
 export type RHFCheckboxProps<TFieldValues extends FieldValues = FieldValues> =
-  | RHFCheckboxSingleProps<TFieldValues>
-  | RHFCheckboxGroupProps<TFieldValues>
+  | SingleProps<TFieldValues>
+  | GroupProps<TFieldValues>
 
-export function RHFCheckbox<TFieldValues extends FieldValues = FieldValues>(props: RHFCheckboxProps<TFieldValues>) {
+export function RHFCheckbox<TFieldValues extends FieldValues = FieldValues>(
+  props: RHFCheckboxProps<TFieldValues>
+) {
   return props.options ? <CheckboxGroup {...props} /> : <SingleCheckbox {...props} />
 }
 
@@ -64,71 +67,93 @@ function SingleCheckbox<TFieldValues extends FieldValues>({
   label,
   hideLabel,
   description,
-  variant = 'default',
+  variant = "default",
   disabled,
   required,
   className,
-}: RHFCheckboxSingleProps<TFieldValues>) {
+}: SingleProps<TFieldValues>) {
   const { control } = useFormContext<TFieldValues>()
-  const { field, fieldState } = useController({ name, control })
-  const invalid = fieldState.invalid
-  const isDisabled = disabled || field.disabled
-  const isCard = variant === 'card'
-  const { fieldId, labelId, descriptionId, errorId, describedBy } = useFieldIds('rhf-checkbox', name, {
-    description,
-    invalid,
-  })
-  const requiredMark = required && <RequiredMark />
+  // useId กัน id ชนเมื่อ name เดียวกันอยู่หลายที่ในหน้า (เช่น form ใน dialog + หน้าที่ซ่อนด้วย <Activity>)
+  const uid = React.useId()
+  const fieldId = `rhf-checkbox-${name}-${uid}`
 
-  const row = (
-    <Field
-      orientation="horizontal"
-      data-invalid={invalid || undefined}
-      data-disabled={isDisabled || undefined}
-      className={isCard ? undefined : className}
-    >
-      <Checkbox
-        id={fieldId}
-        ref={field.ref}
-        name={field.name}
-        checked={!!field.value}
-        // onCheckedChange can report "indeterminate"; the form only stores booleans
-        onCheckedChange={(v) => field.onChange(v === true)}
-        onBlur={field.onBlur}
-        disabled={isDisabled}
-        required={required}
-        aria-invalid={invalid}
-        aria-describedby={describedBy}
-        // card: the label wraps the whole card and would include the description, so name it by the title only
-        aria-labelledby={isCard ? labelId : undefined}
-      />
-      <FieldContent>
-        {isCard ? (
-          <FieldTitle id={labelId}>
-            {label}
-            {requiredMark}
-          </FieldTitle>
-        ) : (
-          <FieldLabel
-            htmlFor={fieldId}
-            className={hideLabel ? 'bom-sr-only' : description ? undefined : 'bom-field__label--normal'}
+  return (
+    <Controller
+      name={name}
+      control={control}
+      render={({ field, fieldState }) => {
+        const invalid = fieldState.invalid
+        const isDisabled = disabled || field.disabled
+        const isCard = variant === "card"
+        const titleId = `${fieldId}-title`
+        const descriptionId = `${fieldId}-description`
+        const errorId = `${fieldId}-error`
+        // ให้ screen reader อ่านคำอธิบายและข้อความ error ต่อจากชื่อช่อง
+        const describedBy =
+          [description && descriptionId, invalid && errorId]
+            .filter(Boolean)
+            .join(" ") || undefined
+
+        // ช่องบังคับ: * ซ่อนจาก screen reader เพราะ Radix Checkbox ใส่ aria-required จาก required อยู่แล้ว
+        const requiredMark = required && (
+          <span aria-hidden="true" className="text-destructive">
+            *
+          </span>
+        )
+        const row = (
+          <Field
+            orientation="horizontal"
+            data-invalid={invalid || undefined}
+            data-disabled={isDisabled || undefined}
+            className={isCard ? undefined : className}
           >
-            {label}
-            {requiredMark}
-          </FieldLabel>
-        )}
-        {description && <FieldDescription id={descriptionId}>{description}</FieldDescription>}
-        {invalid && <FieldError id={errorId} errors={[fieldState.error]} />}
-      </FieldContent>
-    </Field>
-  )
+            <Checkbox
+              id={fieldId}
+              ref={field.ref}
+              name={field.name}
+              checked={!!field.value}
+              // onCheckedChange ส่ง "indeterminate" ได้ด้วย เก็บลงฟอร์มเป็น boolean เท่านั้น
+              onCheckedChange={(v) => field.onChange(v === true)}
+              onBlur={field.onBlur}
+              disabled={isDisabled}
+              required={required}
+              aria-invalid={invalid}
+              aria-describedby={describedBy}
+              // card: label ครอบทั้งการ์ด ชื่อจะรวมคำอธิบายเข้าไปด้วย จึงชี้ชื่อไปที่ title อย่างเดียว
+              aria-labelledby={isCard ? titleId : undefined}
+            />
+            <FieldContent>
+              {isCard ? (
+                <FieldTitle id={titleId}>
+                  {label}
+                  {requiredMark}
+                </FieldTitle>
+              ) : (
+                <FieldLabel
+                  htmlFor={fieldId}
+                  className={hideLabel ? "sr-only" : description ? undefined : "font-normal"}
+                >
+                  {label}
+                  {requiredMark}
+                </FieldLabel>
+              )}
+              {description && (
+                <FieldDescription id={descriptionId}>{description}</FieldDescription>
+              )}
+              {invalid && <FieldError id={errorId} errors={[fieldState.error]} />}
+            </FieldContent>
+          </Field>
+        )
 
-  return isCard ? (
-    <FieldLabel htmlFor={fieldId} className={className}>
-      {row}
-    </FieldLabel>
-  ) : (
-    row
+        return isCard ? (
+          <FieldLabel htmlFor={fieldId} className={className}>
+            {row}
+          </FieldLabel>
+        ) : (
+          row
+        )
+      }}
+    />
   )
 }
 
@@ -138,114 +163,148 @@ function CheckboxGroup<TFieldValues extends FieldValues>({
   hideLabel,
   description,
   options,
-  variant = 'default',
-  orientation = 'vertical',
+  variant = "default",
+  orientation = "vertical",
   disabled,
   className,
-}: RHFCheckboxGroupProps<TFieldValues>) {
+}: GroupProps<TFieldValues>) {
   const { control } = useFormContext<TFieldValues>()
-  const { field, fieldState } = useController({ name, control })
-  const invalid = fieldState.invalid
-  const isDisabled = disabled || field.disabled
-  const isCard = variant === 'card'
-  const values: string[] = Array.isArray(field.value) ? field.value : []
-  // the fieldset is a group named by its legend; the group's description and error are linked to it
-  const { fieldId, descriptionId, errorId, describedBy } = useFieldIds('rhf-checkbox', name, { description, invalid })
-  const groupRef = useRef<HTMLFieldSetElement | null>(null)
-
-  // RHF calls ref.focus() on a failed submit; a fieldset cannot take focus, so focus the first enabled box
-  const focusTarget = {
-    focus: () => {
-      groupRef.current?.querySelector<HTMLButtonElement>('[role="checkbox"]:not(:disabled)')?.focus()
-    },
-  }
-  const toggle = (value: string, checked: boolean) =>
-    field.onChange(checked ? [...values.filter((v) => v !== value), value] : values.filter((v) => v !== value))
+  const uid = React.useId()
+  const fieldId = `rhf-checkbox-${name}-${uid}`
+  const groupRef = React.useRef<HTMLFieldSetElement>(null)
 
   return (
-    <FieldSet
-      ref={(el) => {
-        groupRef.current = el
-        field.ref(el ? focusTarget : null)
-      }}
-      data-invalid={invalid || undefined}
-      data-disabled={isDisabled || undefined}
-      aria-describedby={describedBy}
-      onBlur={(e) => {
-        // blur only when focus leaves the group, not when moving between options
-        if (!e.currentTarget.contains(e.relatedTarget)) field.onBlur()
-      }}
-      className={className}
-    >
-      <FieldLegend variant="label" className={hideLabel ? 'bom-sr-only' : undefined}>
-        {label}
-      </FieldLegend>
-      {description && <FieldDescription id={descriptionId}>{description}</FieldDescription>}
-      <div className={cn('bom-field__options', orientation === 'horizontal' && 'bom-field__options--horizontal')}>
-        {options.map((o, i) => {
-          const itemId = `${fieldId}-${i}`
-          const titleId = `${itemId}-title`
-          const itemDescriptionId = `${itemId}-description`
-          const itemDisabled = isDisabled || o.disabled
-          const item = (
-            <Checkbox
-              id={itemId}
-              name={field.name}
-              value={o.value}
-              checked={values.includes(o.value)}
-              onCheckedChange={(v) => toggle(o.value, v === true)}
-              disabled={itemDisabled}
-              aria-invalid={invalid}
-              aria-labelledby={isCard ? titleId : undefined}
-              aria-describedby={o.description ? itemDescriptionId : undefined}
-            />
+    <Controller
+      name={name}
+      control={control}
+      render={({ field, fieldState }) => {
+        const invalid = fieldState.invalid
+        const isDisabled = disabled || field.disabled
+        const isCard = variant === "card"
+        const values: string[] = Array.isArray(field.value) ? field.value : []
+        const descriptionId = `${fieldId}-description`
+        const errorId = `${fieldId}-error`
+        // fieldset เป็น role group ได้ชื่อจาก legend เอง (ต่างจาก RHFRadioGroup ที่ปิด role ไว้ เพราะไม่มี radiogroup ซ้อน)
+        // คำอธิบายกลุ่มและ error ผูกที่ fieldset ให้ screen reader อ่านเมื่อเข้ากลุ่ม
+        const describedBy =
+          [description && descriptionId, invalid && errorId]
+            .filter(Boolean)
+            .join(" ") || undefined
+
+        // RHF เรียก ref.focus() ตอน submit แล้วผิด: fieldset focus ไม่ได้ จึง focus checkbox ตัวแรกที่กดได้
+        const focusTarget = {
+          focus: () => {
+            groupRef.current
+              ?.querySelector<HTMLButtonElement>('[role="checkbox"]:not(:disabled)')
+              ?.focus()
+          },
+        }
+
+        const toggle = (value: string, checked: boolean) =>
+          field.onChange(
+            checked ? [...values.filter((v) => v !== value), value] : values.filter((v) => v !== value)
           )
-          const itemDescription = o.description && (
-            <FieldDescription id={itemDescriptionId}>{o.description}</FieldDescription>
-          )
-          if (isCard) {
-            return (
-              <FieldLabel key={o.value} htmlFor={itemId}>
-                <Field
-                  orientation="horizontal"
-                  data-invalid={invalid || undefined}
-                  data-disabled={itemDisabled || undefined}
-                >
-                  {item}
-                  <FieldContent>
-                    <FieldTitle id={titleId}>{o.label}</FieldTitle>
-                    {itemDescription}
-                  </FieldContent>
-                </Field>
-              </FieldLabel>
-            )
-          }
-          const itemLabel = (
-            <FieldLabel htmlFor={itemId} className={o.description ? undefined : 'bom-field__label--normal'}>
-              {o.label}
-            </FieldLabel>
-          )
-          return (
-            <Field
-              key={o.value}
-              orientation="horizontal"
-              data-invalid={invalid || undefined}
-              data-disabled={itemDisabled || undefined}
+
+        return (
+          <FieldSet
+            ref={(el) => {
+              groupRef.current = el
+              field.ref(el ? focusTarget : null)
+            }}
+            data-invalid={invalid || undefined}
+            data-disabled={isDisabled || undefined}
+            aria-describedby={describedBy}
+            onBlur={(e) => {
+              // blur เฉพาะตอน focus ออกนอกกลุ่ม ไม่ใช่ตอนเลื่อนระหว่างตัวเลือก
+              if (!e.currentTarget.contains(e.relatedTarget)) field.onBlur()
+            }}
+            className={className}
+          >
+            <FieldLegend variant="label" className={hideLabel ? "sr-only" : undefined}>
+              {label}
+            </FieldLegend>
+            {description && (
+              <FieldDescription id={descriptionId}>{description}</FieldDescription>
+            )}
+            <div
+              data-slot="checkbox-group"
+              className={
+                orientation === "horizontal" ? "flex flex-wrap gap-4" : "flex flex-col gap-3"
+              }
             >
-              {item}
-              {o.description ? (
-                <FieldContent>
-                  {itemLabel}
-                  {itemDescription}
-                </FieldContent>
-              ) : (
-                itemLabel
-              )}
-            </Field>
-          )
-        })}
-      </div>
-      {invalid && <FieldError id={errorId} errors={[fieldState.error]} />}
-    </FieldSet>
+              {options.map((o, i) => {
+                const itemId = `${fieldId}-${i}`
+                const titleId = `${itemId}-title`
+                const itemDescriptionId = `${itemId}-description`
+                const itemDisabled = isDisabled || o.disabled
+                const item = (
+                  <Checkbox
+                    id={itemId}
+                    name={field.name}
+                    value={o.value}
+                    checked={values.includes(o.value)}
+                    onCheckedChange={(v) => toggle(o.value, v === true)}
+                    disabled={itemDisabled}
+                    aria-invalid={invalid}
+                    aria-labelledby={isCard ? titleId : undefined}
+                    aria-describedby={o.description ? itemDescriptionId : undefined}
+                  />
+                )
+                const itemDescription = o.description && (
+                  <FieldDescription id={itemDescriptionId}>{o.description}</FieldDescription>
+                )
+
+                if (isCard) {
+                  return (
+                    <FieldLabel key={o.value} htmlFor={itemId}>
+                      <Field
+                        orientation="horizontal"
+                        data-invalid={invalid || undefined}
+                        data-disabled={itemDisabled || undefined}
+                      >
+                        {item}
+                        <FieldContent>
+                          <FieldTitle id={titleId}>{o.label}</FieldTitle>
+                          {itemDescription}
+                        </FieldContent>
+                      </Field>
+                    </FieldLabel>
+                  )
+                }
+
+                const itemLabel = (
+                  <FieldLabel
+                    htmlFor={itemId}
+                    className={o.description ? undefined : "font-normal"}
+                  >
+                    {o.label}
+                  </FieldLabel>
+                )
+                return (
+                  <Field
+                    key={o.value}
+                    orientation="horizontal"
+                    data-invalid={invalid || undefined}
+                    data-disabled={itemDisabled || undefined}
+                    className={orientation === "horizontal" ? "w-auto" : undefined}
+                  >
+                    {item}
+                    {o.description ? (
+                      <FieldContent>
+                        {itemLabel}
+                        {itemDescription}
+                      </FieldContent>
+                    ) : (
+                      itemLabel
+                    )}
+                  </Field>
+                )
+              })}
+            </div>
+            {invalid && <FieldError id={errorId} errors={[fieldState.error]} />}
+          </FieldSet>
+        )
+      }}
+    />
   )
 }
