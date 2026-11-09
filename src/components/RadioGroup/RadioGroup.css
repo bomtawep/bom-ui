@@ -1,0 +1,60 @@
+.bom-radio-group {
+  display: grid;
+  gap: var(--bom-space-3);
+}
+
+.bom-radio-group[data-orientation='horizontal'] {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.bom-radio {
+  position: relative;
+  display: inline-flex;
+  flex-shrink: 0;
+  width: 1rem;
+  height: 1rem;
+  padding: 0;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--bom-color-input);
+  border-radius: var(--bom-radius-full);
+  background: var(--bom-color-bg);
+  color: var(--bom-color-primary);
+  cursor: pointer;
+}
+
+.bom-radio::after {
+  content: '';
+  position: absolute;
+  inset: -0.5rem;
+}
+
+.bom-radio:focus-visible {
+  outline: 2px solid var(--bom-color-ring);
+  outline-offset: 2px;
+}
+
+.bom-radio[data-state='checked'] {
+  border-color: var(--bom-color-primary);
+}
+
+.bom-radio[aria-invalid='true'] {
+  border-color: var(--bom-color-danger);
+}
+
+.bom-radio:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.bom-radio__indicator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.bom-radio__indicator > svg {
+  width: 0.75rem;
+  height: 0.75rem;
+}

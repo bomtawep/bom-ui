@@ -1,0 +1,87 @@
+.bom-alert {
+  --bom-alert-accent: var(--bom-color-fg);
+  position: relative;
+  display: grid;
+  width: 100%;
+  gap: 2px;
+  padding: var(--bom-space-3) var(--bom-space-4);
+  border: 1px solid var(--bom-color-border);
+  border-radius: var(--bom-radius-lg);
+  background: var(--bom-color-surface);
+  color: var(--bom-color-surface-fg);
+  font-size: var(--bom-font-size-sm);
+  text-align: left;
+  box-sizing: border-box;
+}
+
+.bom-alert:has(> svg) {
+  grid-template-columns: auto 1fr;
+  column-gap: var(--bom-space-3);
+}
+
+.bom-alert > svg {
+  grid-row: span 2;
+  width: 1rem;
+  height: 1rem;
+  translate: 0 2px;
+  color: var(--bom-alert-accent);
+}
+
+.bom-alert:has(> .bom-alert__action) {
+  padding-right: 6rem;
+}
+
+.bom-alert--info {
+  --bom-alert-accent: var(--bom-color-info);
+  border-color: color-mix(in srgb, var(--bom-color-info) 40%, var(--bom-color-border));
+}
+
+.bom-alert--success {
+  --bom-alert-accent: var(--bom-color-success);
+  border-color: color-mix(in srgb, var(--bom-color-success) 40%, var(--bom-color-border));
+}
+
+.bom-alert--warning {
+  --bom-alert-accent: var(--bom-color-warning);
+  border-color: color-mix(in srgb, var(--bom-color-warning) 40%, var(--bom-color-border));
+}
+
+.bom-alert--danger {
+  --bom-alert-accent: var(--bom-color-danger);
+  border-color: color-mix(in srgb, var(--bom-color-danger) 40%, var(--bom-color-border));
+  color: var(--bom-color-danger);
+}
+
+.bom-alert__title {
+  font-weight: var(--bom-font-weight-medium);
+}
+
+.bom-alert:has(> svg) > .bom-alert__title,
+.bom-alert:has(> svg) > .bom-alert__description {
+  grid-column-start: 2;
+}
+
+.bom-alert__description {
+  color: var(--bom-color-muted-fg);
+  text-wrap: pretty;
+}
+
+.bom-alert--danger .bom-alert__description {
+  color: color-mix(in srgb, var(--bom-color-danger) 85%, var(--bom-color-fg));
+}
+
+.bom-alert__title a,
+.bom-alert__description a {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.bom-alert__description p:not(:last-child) {
+  margin-bottom: var(--bom-space-4);
+}
+
+.bom-alert__action {
+  position: absolute;
+  top: var(--bom-space-2);
+  right: var(--bom-space-2);
+}

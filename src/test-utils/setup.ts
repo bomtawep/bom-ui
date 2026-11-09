@@ -25,3 +25,31 @@ if (typeof Element.prototype.releasePointerCapture !== 'function') {
 if (typeof Element.prototype.scrollIntoView !== 'function') {
   Element.prototype.scrollIntoView = () => {}
 }
+
+// Sidebar (useIsMobile) and Radix read matchMedia; jsdom lacks it.
+if (typeof window.matchMedia !== 'function') {
+  window.matchMedia = (query: string) =>
+    ({
+      matches: false,
+      media: query,
+      onchange: null,
+      addEventListener: () => {},
+      removeEventListener: () => {},
+      addListener: () => {},
+      removeListener: () => {},
+      dispatchEvent: () => false,
+    }) as unknown as MediaQueryList
+}
+// Radix Select/Menu open on pointerdown and check PointerEvent fields.
+if (typeof window.PointerEvent !== 'function') {
+  class PointerEventStub extends MouseEvent {
+    pointerId: number
+    pointerType: string
+    constructor(type: string, init: PointerEventInit = {}) {
+      super(type, init)
+      this.pointerId = init.pointerId ?? 1
+      this.pointerType = init.pointerType ?? 'mouse'
+    }
+  }
+  window.PointerEvent = PointerEventStub as unknown as typeof PointerEvent
+}

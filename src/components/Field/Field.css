@@ -1,0 +1,283 @@
+/* ---------- FieldSet / Legend / Group ---------- */
+.bom-field-set {
+  display: flex;
+  flex-direction: column;
+  gap: var(--bom-space-4);
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.bom-field-set:has(> .bom-radio-group, > .bom-field-group > .bom-field--horizontal) {
+  gap: var(--bom-space-3);
+}
+
+.bom-field-legend {
+  margin-bottom: var(--bom-space-2);
+  padding: 0;
+  font-weight: var(--bom-font-weight-medium);
+  color: var(--bom-color-fg);
+}
+
+.bom-field-legend--legend {
+  font-size: var(--bom-font-size-md);
+}
+
+.bom-field-legend--label {
+  font-size: var(--bom-font-size-sm);
+}
+
+.bom-field-group {
+  container-type: inline-size;
+  container-name: bom-field-group;
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  gap: var(--bom-space-5);
+}
+
+.bom-field-group > .bom-field-group {
+  gap: var(--bom-space-4);
+}
+
+/* ---------- Field ---------- */
+.bom-field {
+  display: flex;
+  width: 100%;
+  gap: var(--bom-space-2);
+}
+
+.bom-field--vertical,
+.bom-field--responsive {
+  flex-direction: column;
+}
+
+.bom-field--vertical > :not(.bom-sr-only):not(.bom-checkbox):not(.bom-radio):not(.bom-switch),
+.bom-field--responsive > :not(.bom-sr-only):not(.bom-checkbox):not(.bom-radio):not(.bom-switch) {
+  width: 100%;
+}
+
+.bom-field--horizontal {
+  flex-direction: row;
+  align-items: center;
+}
+
+.bom-field--horizontal:has(> .bom-field__content) {
+  align-items: flex-start;
+}
+
+.bom-field--horizontal > .bom-field__label {
+  flex: none;
+  min-height: var(--bom-control-height-md);
+}
+
+/* label + checkbox/switch rows: the label text takes the remaining space */
+.bom-field--horizontal:has(> .bom-checkbox, > .bom-radio, > .bom-switch) > .bom-field__label {
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.bom-field--horizontal:has(> .bom-field__content) > :is(.bom-checkbox, .bom-radio) {
+  margin-top: 1px;
+}
+
+@container bom-field-group (min-width: 28rem) {
+  .bom-field--responsive {
+    flex-direction: row;
+    align-items: center;
+  }
+
+  .bom-field--responsive > :not(.bom-sr-only) {
+    width: auto;
+  }
+
+  .bom-field--responsive:has(> .bom-field__content) {
+    align-items: flex-start;
+  }
+
+  .bom-field--responsive > .bom-field__label {
+    flex: 1 1 auto;
+  }
+}
+
+.bom-field[data-disabled] .bom-field__label,
+.bom-field[data-disabled] .bom-field__title {
+  opacity: 0.5;
+}
+
+.bom-field[data-invalid] > .bom-field__label,
+.bom-field[data-invalid] > .bom-field__content > .bom-field__label {
+  color: var(--bom-color-danger);
+}
+
+/* ---------- Parts ---------- */
+.bom-field__content {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: var(--bom-space-1);
+  min-width: 0;
+  line-height: 1.375;
+}
+
+.bom-field__label {
+  width: fit-content;
+  gap: var(--bom-space-2);
+  line-height: 1.375;
+}
+
+/* choice card: <FieldLabel><Field>…</Field></FieldLabel> */
+.bom-field__label:has(> .bom-field) {
+  width: 100%;
+  flex-direction: column;
+  border: 1px solid var(--bom-color-border);
+  border-radius: var(--bom-radius-lg);
+  cursor: pointer;
+}
+
+.bom-field__label > .bom-field {
+  padding: var(--bom-space-3);
+}
+
+.bom-field__label:has(> .bom-field):hover {
+  background: var(--bom-color-accent);
+}
+
+.bom-field__label:has([data-state='checked']) {
+  border-color: var(--bom-color-primary);
+}
+
+.bom-field__label:has(:focus-visible) {
+  outline: 2px solid var(--bom-color-ring);
+  outline-offset: 2px;
+}
+
+.bom-field__title {
+  display: flex;
+  width: fit-content;
+  align-items: center;
+  gap: var(--bom-space-2);
+  font-size: var(--bom-font-size-sm);
+  font-weight: var(--bom-font-weight-medium);
+}
+
+.bom-field__description {
+  margin: 0;
+  color: var(--bom-color-muted-fg);
+  font-size: var(--bom-font-size-sm);
+  font-weight: normal;
+  line-height: 1.5;
+  text-align: left;
+}
+
+.bom-field-legend--legend + .bom-field__description {
+  margin-top: calc(var(--bom-space-2) * -1);
+}
+
+.bom-field__description a {
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+.bom-field__description a:hover {
+  color: var(--bom-color-primary);
+}
+
+.bom-field__error {
+  color: var(--bom-color-danger);
+  font-size: var(--bom-font-size-sm);
+  font-weight: normal;
+}
+
+.bom-field__error-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--bom-space-1);
+  margin: 0;
+  padding-left: var(--bom-space-4);
+  list-style: disc;
+}
+
+/* ---------- Separator ---------- */
+.bom-field-separator {
+  position: relative;
+  height: 1.25rem;
+  margin: calc(var(--bom-space-2) * -1) 0;
+  font-size: var(--bom-font-size-sm);
+}
+
+.bom-field-separator__line {
+  position: absolute;
+  top: 50%;
+  left: 0;
+}
+
+.bom-field-separator__content {
+  position: relative;
+  display: block;
+  width: fit-content;
+  margin: 0 auto;
+  padding: 0 var(--bom-space-2);
+  background: var(--bom-color-bg);
+  color: var(--bom-color-muted-fg);
+}
+
+/* ---------- Helpers used by the RHF* components ---------- */
+.bom-field__required {
+  color: var(--bom-color-danger);
+}
+
+.bom-field__row {
+  display: flex;
+  gap: var(--bom-space-3);
+}
+
+.bom-field__col {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: var(--bom-space-2);
+  min-width: 0;
+}
+
+.bom-field__col--time {
+  flex: none;
+  width: 8rem;
+}
+
+.bom-field__append {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  gap: var(--bom-space-2);
+}
+
+.bom-field__options {
+  display: flex;
+  flex-direction: column;
+  gap: var(--bom-space-3);
+}
+
+.bom-field__options--horizontal {
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: var(--bom-space-4);
+}
+
+.bom-field__options--horizontal > .bom-field {
+  width: auto;
+}
+
+.bom-field__label--normal {
+  font-weight: normal;
+}
+
+/* a legend is not flex like FieldLabel, so space the required mark by hand */
+.bom-field-legend .bom-field__required {
+  margin-left: var(--bom-space-2);
+}
+
+.bom-field--auto {
+  width: auto;
+}

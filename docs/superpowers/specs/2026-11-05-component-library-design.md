@@ -74,6 +74,8 @@ banner `'use client'` ครอบทั้ง bundle — component ที่ไ
 | 5. Data display | 0.6.0 | `Alert`, `Skeleton`, `Breadcrumb`, `Pagination`, `Table` (+`TableHeader`, `TableBody`, `TableRow`, `TableHead`, `TableCell`, `TableCaption`) |
 | API freeze | 1.0.0 | ไม่มี component ใหม่ — ทบทวนความสม่ำเสมอของชื่อ prop และเขียน Migration ใน CHANGELOG |
 
+> ช่วง 2–5 ถูกแทนด้วย [2026-11-09-poc-components-port-design.md](2026-11-09-poc-components-port-design.md) (ทำรวมใน 0.2.0)
+
 ### รายละเอียดที่ตัดสินใจแล้ว
 
 - **`FormField`** — props `label`, `description?`, `error?`, `required?`, `children` (control ตัวเดียว) สร้าง id ด้วย `useId` แล้วส่งผ่าน context ให้ `Input` / `Textarea` / `Select` / `Checkbox` / `Switch` / `RadioGroup` อ่าน `id`, `aria-describedby`, `aria-invalid`, `aria-required` อัตโนมัติ — ใช้ร่วมกับ react-hook-form ได้เพราะ control ยัง forward ref และ `...props`

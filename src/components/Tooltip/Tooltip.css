@@ -1,0 +1,36 @@
+.bom-tooltip {
+  z-index: var(--bom-z-popover);
+  width: fit-content;
+  max-width: 20rem;
+  padding: var(--bom-space-1) var(--bom-space-2);
+  border-radius: var(--bom-radius-md);
+  background: var(--bom-color-fg);
+  color: var(--bom-color-bg);
+  font-size: var(--bom-font-size-xs);
+  line-height: 1.4;
+  text-wrap: balance;
+  transform-origin: var(--radix-tooltip-content-transform-origin);
+  animation: bom-tooltip-in var(--bom-duration-fast) ease-out;
+}
+
+.bom-tooltip .bom-kbd {
+  background: color-mix(in srgb, var(--bom-color-bg) 20%, transparent);
+  color: var(--bom-color-bg);
+}
+
+.bom-tooltip__arrow {
+  fill: var(--bom-color-fg);
+}
+
+@keyframes bom-tooltip-in {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bom-tooltip {
+    animation: none;
+  }
+}

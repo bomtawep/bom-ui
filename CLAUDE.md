@@ -31,6 +31,7 @@ React component library สำหรับ Next.js (App Router + Pages Router) �
 - [.claude/rules/04-registry-publish.md](.claude/rules/04-registry-publish.md) — GitHub Packages, publish workflow (CI)
 - [.claude/rules/05-consumer-setup.md](.claude/rules/05-consumer-setup.md) — วิธีติดตั้งในโปรเจกต์ปลายทาง (`.npmrc`, CI, Docker)
 - [.claude/rules/06-security-tokens.md](.claude/rules/06-security-tokens.md) — การจัดการ token / secret
+- [.claude/rules/07-git-no-auto-commit.md](.claude/rules/07-git-no-auto-commit.md) — Claude ห้าม commit / push / release เอง
 - [docs/superpowers/specs/2026-11-05-component-library-design.md](docs/superpowers/specs/2026-11-05-component-library-design.md) — แผนรวม component ทั้งชุด (5 ช่วง) และ Definition of Done
 
 ## Commands
@@ -59,3 +60,4 @@ git push --follow-tags
 4. ห้าม commit token ใด ๆ (`.yarnrc.yml` / `.npmrc` อ้าง `${NPM_TOKEN}` เท่านั้น)
 5. ทุก public component ต้อง export ผ่าน `src/index.ts`
 6. Yarn 4 **ไม่อ่าน `.npmrc`** — config registry/auth ต้องอยู่ใน `.yarnrc.yml` (`npmScopes`)
+7. **Claude ห้าม commit เอง** — ห้าม `git commit` / `merge` / `rebase` / `reset` / `tag` / `push` / `yarn release` / `gh pr` เว้นแต่ผู้ใช้สั่งชัด ๆ ในข้อความนั้น ให้ทิ้งงานไว้ใน working tree แล้วเสนอข้อความ commit (override ขั้น Commit ใน plan/skill ทุกตัว — ดู [07](.claude/rules/07-git-no-auto-commit.md))

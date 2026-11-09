@@ -29,7 +29,7 @@ export default defineConfig({
   dts: true,
   sourcemap: true,
   clean: true,
-  external: ['react', 'react-dom', 'next'],
+  external: ['react', 'react-dom', 'next', 'react-hook-form'],
   // Directives are stripped during bundling; re-add so App Router treats the bundle as client code.
   banner: { js: "'use client'" },
   onSuccess: bundleCss,
